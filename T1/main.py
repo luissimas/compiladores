@@ -29,11 +29,14 @@ input_stream = InputStream(input_expr)
 lexer = LALexer(input_stream)
 
 def format_token(token):
-    rule = lexer.symbolicNames[token.type]
-    token_name = f"'{token.text}'" if rule == 'PALAVRA_CHAVE' or rule == 'PONTUACAO' or rule == 'TIPO' or rule == 'OPERADOR' else rule
-    token_text = token.text
+    try:
+        rule = lexer.symbolicNames[token.type]
+        token_name = f"'{token.text}'" if rule == 'PALAVRA_CHAVE' or rule == 'PONTUACAO' or rule == 'TIPO' or rule == 'OPERADOR' else rule
+        token_text = token.text
 
-    return f"<'{token_text}',{token_name}>"
+        return f"<'{token_text}',{token_name}>"
+    except Exception as e:
+        return e
 
 lexer.reset()
 
