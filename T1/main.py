@@ -31,7 +31,7 @@ lexer = LALexer(input_stream)
 def format_token(token):
     try:
         rule = lexer.symbolicNames[token.type]
-        token_name = f"'{token.text}'" if rule == 'PALAVRA_CHAVE' or rule == 'PONTUACAO' or rule == 'TIPO' or rule == 'OPERADOR' else rule
+        token_name = f"'{token.text}'" if rule == 'ARRAY' or rule == 'PALAVRA_CHAVE' or rule == 'PONTUACAO' or rule == 'TIPO' or rule == 'OPERADOR' else rule
         token_text = token.text
 
         return f"<'{token_text}',{token_name}>"
