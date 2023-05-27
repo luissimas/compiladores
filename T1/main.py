@@ -34,6 +34,13 @@ def format_token(token):
         token_name = f"'{token.text}'" if rule == 'ARRAY' or rule == 'PALAVRA_CHAVE' or rule == 'PONTUACAO' or rule == 'TIPO' or rule == 'OPERADOR' else rule
         token_text = token.text
 
+        if rule == "ERRO":
+            return f"{token.text} - simbolo nao identificado"
+        elif rule == "ERRO_COMENTARIO":
+            return "comentario nao fechado"
+        elif rule == "ERRO_STRING":
+            return "cadeia literal nao fechada"
+
         return f"<'{token_text}',{token_name}>"
     except Exception as e:
         return e
@@ -43,6 +50,10 @@ lexer.reset()
 output = ''
 
 for token in lexer.getAllTokens():
+    error = lexer.symbolicNames[token.type]
+    if(error == "ERRO" or error == "ERRO_COMENTARIO" or error == "ERRO_STRING"):
+        output += f"Linha {token.line}: {format_token(token)}\n"
+        break
     output += f"{format_token(token)}\n"
 
 
