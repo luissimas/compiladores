@@ -32,14 +32,14 @@ class Lexer:
             rule = self.lexer.symbolicNames[token.type]
 
             if rule in self.error_messages:
-                output += self._format_error(token)
+                output += self.__format_error(token)
                 break
 
-            output += self._format_token(token)
+            output += self.__format_token(token)
 
         return output
 
-    def _format_error(self, token):
+    def __format_error(self, token):
         if not self.lexer:
             raise Exception("Lexer não inicializado")
 
@@ -48,7 +48,7 @@ class Lexer:
 
         return f"Linha {token.line}: {error_message}\n"
 
-    def _format_token(self, token):
+    def __format_token(self, token):
         if not self.lexer:
             raise Exception("Lexer não inicializado")
 
