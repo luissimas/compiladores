@@ -66,6 +66,20 @@ python main.py in.txt out.txt
 
 Note que ao executar o lexer através do comando `make` o lexer será gerado automaticamente caso alguma alteração seja feita no arquivo da gramática. Dessa forma, caso opte por não utilizar as rotinas do Makefile, será necessário [gerar manualmente](#gerando-o-lexer) o lexer.
 
+### Executando os casos de teste
+O diretório `casos-de-teste` na raiz do projeto fornece diversos casos de teste para os trabalhos.
+
+Para executar os casos de teste, siga as etapas abaixo:
+
+1. Certifique-se de ter o `corretor.jar` o diretório `casos-de-teste` presentes no diretório raiz do projeto.
+2. Execute o seguinte comando:
+
+``` shell
+make test
+```
+
+Isso executará o programa principal com a bateria de testes fornecida pelo corretor.jar. Os resultados dos testes serão exibidos no terminal.
+
 ### Limpando o arquivo de saída
 Caso deseje remover o arquivo de saída gerado, você pode executar o seguinte comando:
 

@@ -8,7 +8,6 @@ tmp/
 build
 htmlcov
 
-T1/temp
 */__pycache__
 T1/LALexer.py
 T1/LALexer.java
