@@ -3,5 +3,7 @@ Trabalhos realizados ao longo da disciplina de Compiladores no semestre 2023/1 d
 
 ## Integrantes: 
 Luana de Queiroz Garcia - 740953
+
 Luís Augusto Simas do Nascimento - 790828
+
 Mateus Grota Nishimura Ferro - 771043

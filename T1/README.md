@@ -13,7 +13,7 @@ Antes de executar o projeto, certifique-se de ter os seguintes requisitos atendi
 1. Clone este repositório para o seu ambiente local:
 
 ``` shell
-git clone <url-do-repositorio>
+git clone https://github.com/luissimas/compiladores.git
 ```
 
 2. Navegue até o diretório T1:
