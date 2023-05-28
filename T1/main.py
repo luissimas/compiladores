@@ -5,20 +5,32 @@ from lexer import Lexer
 
 
 def run_script():
+    """
+    Executa o script principal.
+
+    O script lê um arquivo de entrada, realiza a tokenização usando a classe Lexer e escreve
+    a saída em um arquivo de saída.
+
+    Parâmetros:
+    - Nenhum.
+
+    Retorna:
+    - Nenhum.
+    """
     if len(argv) != 3:
         print(
             """
-        Usage: python main.py [input_file] [output_file]
+        Uso: python nome_do_script.py arquivo_entrada arquivo_saida
 
-        Description:
-        This script takes an LA language input file, parses it and writes the resulting tokens to the specified output file.
+        Descrição: Este script realiza a tokenização do conteúdo de um arquivo de entrada
+                    e escreve a saída no arquivo especificado.
 
-        Arguments:
-        input_file    Path to the input file.
-        output_file   Path to the output file.
+        Argumentos:
+        - arquivo_entrada: Caminho para o arquivo de entrada contendo o texto a ser tokenizado.
+        - arquivo_saida: Caminho para o arquivo de saída onde a representação dos tokens será escrita.
 
-        Example:
-        python main.py input.txt output.txt
+        Exemplo de uso:
+        python nome_do_script.py input.txt output.txt
         """
         )
         exit(1)
