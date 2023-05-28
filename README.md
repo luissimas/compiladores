@@ -1,9 +1,9 @@
-# TODO
-Para compilar as mudanças do ANTRL use:
-```cd T1 && ./generate_lexer.sh```
+# Compiladores
+Trabalhos realizados ao longo da disciplina de Compiladores no semestre 2023/1 da UFSCar sob a orientação do professor Daniel Lucrédio.
 
-Para testar os casos use:
-```cd .. && ./corretor.sh```
+## Integrantes: 
+Luana de Queiroz Garcia - 740953
 
-Para testar um caso em específico use por exemplo (para testar o caso 33 do T1):
-```cd T1 && ./main.py ../casos-de-teste/1.casos_teste_t1/entrada/33-algoritmo_6-10_apostila_LA_erro_linha_10.txt ../tmp/teste.txt```
+Luís Augusto Simas do Nascimento - 790828
+
+Mateus Grota Nishimura Ferro - 771043

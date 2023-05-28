@@ -7,3 +7,10 @@ tmp/
 *.egg
 build
 htmlcov
+
+*/__pycache__
+T1/LALexer.py
+T1/LALexer.java
+T1/LALexer.tokens
+T1/LALexer.interp
+T1/out.txt
