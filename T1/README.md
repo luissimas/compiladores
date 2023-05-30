@@ -3,6 +3,13 @@ O Trabalho 1 da disciplina consiste em implementar um analisador léxico para a 
 
 Tendo isso em vista, este projeto consiste em um lexer desenvolvido com ANTLR para analisar e tokenizar um arquivo de entrada seguindo a gramática definida no arquivo `LALexer.g4`.
 
+## Integrantes: 
+Luana de Queiroz Garcia - 740953
+
+Luís Augusto Simas do Nascimento - 790828
+
+Mateus Grota Nishimura Ferro - 771043
+
 ## Pré-requisitos
 Antes de executar o projeto, certifique-se de ter os seguintes requisitos atendidos:
 
