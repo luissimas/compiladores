@@ -4,8 +4,9 @@ from sys import argv
 
 from antlr4 import CommonTokenStream
 from lexer import Lexer
-from parser import Parser
+from parser import Parser, CustomErrorListener
 
+import globals
 
 def run_script():
     """
@@ -54,12 +55,14 @@ def run_script():
     else:
         parser = Parser()
         parser.parse(lexer_result)
+    
+    output = globals.error_message
+    output = output + "\nFim da compilacao\n"
+    print(output)
 
     with open(output_file, "w") as file:
         file.write(output)
         file.close()
-
-    print(output)
 
 
 if __name__ == "__main__":

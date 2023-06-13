@@ -1,6 +1,5 @@
 { leitura de nome e idade com escrita de mensagem usando estes dados }
 
-algoritmo
 
 	declare
 		nome: literal

@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 from LAGrammarParser import LAGrammarParser
 from antlr4.error.ErrorListener import ErrorListener
-
+import globals
 
 class CustomErrorListener(ErrorListener):
+    
+
     def syntaxError(self, recognizer, offendingSymbol, line, column, msg, e):
-        error_message = f"Linha {line}: erro sintatico proximo a {offendingSymbol.text}"
-        print(error_message)
-        return error_message
+        globals.error_message = f"Linha {line}: erro sintatico proximo a {offendingSymbol.text}"
+        print(globals.error_message)
+        return globals.error_message
 
 
 class Parser:
@@ -16,4 +18,4 @@ class Parser:
         parser = LAGrammarParser(token_stream)
         parser.addErrorListener(error_listener)
         a = parser.programa()
-        print(a)
+        #print(a)

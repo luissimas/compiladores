@@ -3,7 +3,6 @@
 from antlr4 import CommonTokenStream, InputStream
 from LAGrammarLexer import LAGrammarLexer
 
-
 class Lexer:
     def __init__(self):
         """
@@ -30,6 +29,7 @@ class Lexer:
             "SIMBOLO_NAO_IDENTIFICADO": "%s - simbolo nao identificado",
             "COMENTARIO_NAO_FECHADO": "comentario nao fechado",
             "CADEIA_NAO_FECHADA": "cadeia literal nao fechada",
+            "ERRO_SINTATICO": "erro sintatico proximo a %s"
         }
 
     def tokenize(self, input):
@@ -39,8 +39,21 @@ class Lexer:
         input_stream = InputStream(input)
         self.lexer = LAGrammarLexer(input_stream)
         self.lexer.reset()
-
         tokens = CommonTokenStream(self.lexer)
+
+        # Acessar os tokens individualmente ou percorrê-los
+        output = ""
+        """        
+        for token in self.lexer.getAllTokens():
+
+            rule = self.lexer.symbolicNames[token.type]
+
+            if rule in self.error_messages:
+                output += self.__format_error(token)
+                break
+
+            output += self.__format_token(token)
+        """
 
         return tokens
 

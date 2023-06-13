@@ -1,4 +1,4 @@
-# Generated from LAGrammar.g4 by ANTLR 4.12.0
+# Generated from LAGrammar.g4 by ANTLR 4.13.0
 # encoding: utf-8
 from antlr4 import *
 from io import StringIO
@@ -390,7 +390,7 @@ class LAGrammarParser ( Parser ):
 
     def __init__(self, input:TokenStream, output:TextIO = sys.stdout):
         super().__init__(input, output)
-        self.checkVersion("4.12.0")
+        self.checkVersion("4.13.0")
         self._interp = ParserATNSimulator(self, self.atn, self.decisionsToDFA, self.sharedContextCache)
         self._predicates = None
 
@@ -435,11 +435,11 @@ class LAGrammarParser ( Parser ):
             self.state = 100
             self.declaracoes()
             self.state = 101
-            self.match(LAGrammarParser.T__0)
+            error = self.match(LAGrammarParser.T__0)
             self.state = 102
             self.corpo()
             self.state = 103
-            self.match(LAGrammarParser.T__1)
+            error1 = self.match(LAGrammarParser.T__1)
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)

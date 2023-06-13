@@ -18,4 +18,4 @@ test: compile
 		@java -jar ../corretor.jar "$$(pwd)/main.py" gcc tmp ../casos-de-teste "740953,771043,790828" t2
 
 run: compile
-		@python $(MAIN_SCRIPT) $(INPUT_FILE) $(OUTPUT_FILE)
+		@python3 $(MAIN_SCRIPT) $(INPUT_FILE) $(OUTPUT_FILE)
