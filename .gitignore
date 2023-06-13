@@ -14,3 +14,11 @@ T1/LALexer.java
 T1/LALexer.tokens
 T1/LALexer.interp
 T1/out.txt
+
+T2/LAGrammar.interp
+T2/LAGrammar.tokens
+T2/LAGrammarLexer.interp
+T2/LAGrammarLexer.py
+T2/LAGrammarLexer.tokens
+T2/LAGrammarListener.py
+T2/LAGrammarParser.py

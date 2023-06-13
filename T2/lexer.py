@@ -3,6 +3,7 @@
 from antlr4 import CommonTokenStream, InputStream
 from LAGrammarLexer import LAGrammarLexer
 
+
 class Lexer:
     def __init__(self):
         """
@@ -29,24 +30,35 @@ class Lexer:
             "SIMBOLO_NAO_IDENTIFICADO": "%s - simbolo nao identificado",
             "COMENTARIO_NAO_FECHADO": "comentario nao fechado",
             "CADEIA_NAO_FECHADA": "cadeia literal nao fechada",
-            "ERRO_SINTATICO": "erro sintatico proximo a %s"
+            "ERRO_SINTATICO": "erro sintatico proximo a %s",
         }
 
     def tokenize(self, input):
         """
-        TODO
+        Realiza a análise léxica da entrada fornecida e retorna um objeto `CommonTokenStream`
+        contendo os tokens resultantes.
+
+        Parâmetros:
+        - input: Uma string contendo o texto de entrada a ser analisado léxicamente.
+
+        Retorna:
+        - Um objeto `CommonTokenStream` que contém os tokens resultantes da análise léxica.
+
+        Lança:
+        - SyntaxError: Se um token inválido ou inesperado for encontrado durante a análise léxica.
+        - Exception: Se o lexer não foi inicializado corretamente.
         """
         input_stream = InputStream(input)
         self.lexer = LAGrammarLexer(input_stream)
         self.lexer.reset()
         tokens = CommonTokenStream(self.lexer)
-             
+
         for token in self.lexer.getAllTokens():
             rule = self.lexer.ruleNames[token.type - 1]
 
             if rule in self.error_messages:
                 raise SyntaxError(self.__format_error(token))
-        
+
         self.lexer.reset()
         return CommonTokenStream(self.lexer)
 

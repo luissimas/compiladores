@@ -30,7 +30,7 @@ def run_script():
         - arquivo_saida: Caminho para o arquivo de saída onde a representação dos tokens será escrita.
 
         Exemplo de uso:
-        python nome_do_script.py input.txt output.txt
+        python main.py input.txt output.txt
         """
         )
         exit(1)
