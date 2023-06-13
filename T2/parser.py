@@ -16,8 +16,4 @@ class Parser:
         parser = LAGrammarParser(token_stream)
         parser.removeErrorListeners()
         parser.addErrorListener(error_listener)
-        try:
-            result = parser.programa()
-            return result
-        except SyntaxError as error:
-            return error.msg
+        return parser.programa()

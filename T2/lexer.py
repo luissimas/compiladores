@@ -40,22 +40,15 @@ class Lexer:
         self.lexer = LAGrammarLexer(input_stream)
         self.lexer.reset()
         tokens = CommonTokenStream(self.lexer)
-
-        # Acessar os tokens individualmente ou percorrê-los
-        output = ""
-        """        
+             
         for token in self.lexer.getAllTokens():
-
-            rule = self.lexer.symbolicNames[token.type]
+            rule = self.lexer.ruleNames[token.type - 1]
 
             if rule in self.error_messages:
-                output += self.__format_error(token)
-                break
-
-            output += self.__format_token(token)
-        """
-
-        return tokens
+                raise SyntaxError(self.__format_error(token))
+        
+        self.lexer.reset()
+        return CommonTokenStream(self.lexer)
 
     def __format_error(self, token):
         """
@@ -73,10 +66,10 @@ class Lexer:
         if not self.lexer:
             raise Exception("Lexer não inicializado")
 
-        rule = self.lexer.symbolicNames[token.type]
+        rule = self.lexer.ruleNames[token.type - 1]
         error_message = self.error_messages[rule].replace("%s", token.text)
 
-        return f"Linha {token.line}: {error_message}\n"
+        return f"Linha {token.line}: {error_message}"
 
     def __format_token(self, token):
         """

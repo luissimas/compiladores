@@ -192,7 +192,7 @@ def serializedATN():
         501,503,5,64,0,0,502,499,1,0,0,0,502,501,1,0,0,0,503,83,1,0,0,0,
         504,508,3,66,33,0,505,506,3,86,43,0,506,507,3,66,33,0,507,509,1,
         0,0,0,508,505,1,0,0,0,508,509,1,0,0,0,509,85,1,0,0,0,510,511,7,4,
-        0,0,511,87,1,0,0,0,512,518,3,90,45,0,513,514,3,98,49,0,514,515,3,
+        0,0,511,87,1,0,0,0,512,518,3,90,45,0,513,514,3,96,48,0,514,515,3,
         92,46,0,515,517,1,0,0,0,516,513,1,0,0,0,517,520,1,0,0,0,518,516,
         1,0,0,0,518,519,1,0,0,0,519,89,1,0,0,0,520,518,1,0,0,0,521,527,3,
         92,46,0,522,523,3,98,49,0,523,524,3,92,46,0,524,526,1,0,0,0,525,
@@ -435,11 +435,11 @@ class LAGrammarParser ( Parser ):
             self.state = 100
             self.declaracoes()
             self.state = 101
-            error = self.match(LAGrammarParser.T__0)
+            self.match(LAGrammarParser.T__0)
             self.state = 102
             self.corpo()
             self.state = 103
-            error1 = self.match(LAGrammarParser.T__1)
+            self.match(LAGrammarParser.T__1)
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -3332,11 +3332,11 @@ class LAGrammarParser ( Parser ):
             return self.getTypedRuleContext(LAGrammarParser.Termo_logicoContext,0)
 
 
-        def op_logico_2(self, i:int=None):
+        def op_logico_1(self, i:int=None):
             if i is None:
-                return self.getTypedRuleContexts(LAGrammarParser.Op_logico_2Context)
+                return self.getTypedRuleContexts(LAGrammarParser.Op_logico_1Context)
             else:
-                return self.getTypedRuleContext(LAGrammarParser.Op_logico_2Context,i)
+                return self.getTypedRuleContext(LAGrammarParser.Op_logico_1Context,i)
 
 
         def fator_logico(self, i:int=None):
@@ -3372,9 +3372,9 @@ class LAGrammarParser ( Parser ):
             self.state = 518
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            while _la==59:
+            while _la==58:
                 self.state = 513
-                self.op_logico_2()
+                self.op_logico_1()
                 self.state = 514
                 self.fator_logico()
                 self.state = 520
@@ -3429,22 +3429,22 @@ class LAGrammarParser ( Parser ):
 
         localctx = LAGrammarParser.Termo_logicoContext(self, self._ctx, self.state)
         self.enterRule(localctx, 90, self.RULE_termo_logico)
+        self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 521
             self.fator_logico()
             self.state = 527
             self._errHandler.sync(self)
-            _alt = self._interp.adaptivePredict(self._input,54,self._ctx)
-            while _alt!=2 and _alt!=ATN.INVALID_ALT_NUMBER:
-                if _alt==1:
-                    self.state = 522
-                    self.op_logico_2()
-                    self.state = 523
-                    self.fator_logico() 
+            _la = self._input.LA(1)
+            while _la==59:
+                self.state = 522
+                self.op_logico_2()
+                self.state = 523
+                self.fator_logico()
                 self.state = 529
                 self._errHandler.sync(self)
-                _alt = self._interp.adaptivePredict(self._input,54,self._ctx)
+                _la = self._input.LA(1)
 
         except RecognitionException as re:
             localctx.exception = re

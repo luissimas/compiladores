@@ -43,24 +43,25 @@ def run_script():
         input = file.read()
         file.close()
 
-    lexer = Lexer()
-    lexer_result = lexer.tokenize(input)
-
     output = ""
 
-    if not isinstance(lexer_result, CommonTokenStream):
-        output = lexer_result
-    else:
+    try:
+        lexer = Lexer()
         parser = Parser()
+
+        lexer_result = lexer.tokenize(input)
         output = parser.parse(lexer_result)
-    
+    except SyntaxError as error:
+        output = error.msg
+
     output += '\nFim da compilacao\n'
+    output = str.replace(output, '<EOF>', 'EOF')
+    
     print(output)
 
     with open(output_file, "w") as file:
         file.write(output)
         file.close()
-
 
 if __name__ == "__main__":
     run_script()

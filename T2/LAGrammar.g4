@@ -19,7 +19,7 @@ PONTUACAO: (',' | ':' | '(' | ')' | '..' | '.' | '-');
 IDENT: ('a'..'z' | 'A'..'Z' | '_') ('a'..'z' | 'A'..'Z' | '0'..'9' | '_')*;
 
 // Erros
-SIMBOLO_NAO_IDENTIFICADO: ('}' | '~' | '^' | '$');
+SIMBOLO_NAO_IDENTIFICADO: ('}' | '~' | '^' | '$' | '|' | '!' | '@');
 COMENTARIO_NAO_FECHADO: '{' ~('}')* '\n';
 CADEIA_NAO_FECHADA: '"' ~('"')* '\n';
 
@@ -82,7 +82,7 @@ parcela_unario: '^'? identificador
 parcela_nao_unario: '&' identificador | CADEIA;
 exp_relacional: exp_aritmetica (op_relacional exp_aritmetica)?;
 op_relacional: '=' | '<>' | '>=' | '<=' | '>' | '<';
-expressao: termo_logico (op_logico_2 fator_logico)*;
+expressao: termo_logico (op_logico_1 fator_logico)*;
 termo_logico: fator_logico (op_logico_2 fator_logico)*;
 fator_logico: 'nao'? parcela_logica;
 parcela_logica: ( 'verdadeiro' | 'falso' )
