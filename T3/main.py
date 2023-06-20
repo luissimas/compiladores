@@ -5,6 +5,7 @@ from sys import argv
 from antlr4 import CommonTokenStream
 from lexer import Lexer
 from parser import Parser
+from alguma import Jander
 
 
 def run_script():
@@ -49,9 +50,11 @@ def run_script():
     try:
         lexer = Lexer()
         parser = Parser()
+        jander = Jander()
 
         lexer_result = lexer.tokenize(input)
-        parser.parse(lexer_result)
+        context = parser.parse(lexer_result)
+        output = jander.visitPrograma(context)
     except SyntaxError as error:
         output = error.msg
 

@@ -48,4 +48,4 @@ class Parser:
         parser = LAGrammarParser(token_stream)
         parser.removeErrorListeners()
         parser.addErrorListener(error_listener)
-        parser.programa()
+        return parser.programa()

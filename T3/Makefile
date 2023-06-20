@@ -1,4 +1,4 @@
-GENERATE_PARSER_COMMAND = antlr4 -Dlanguage=Python3 LAGrammar.g4
+GENERATE_PARSER_COMMAND = antlr4 -Dlanguage=Python3 -visitor LAGrammar.g4
 GRAMMAR_FILE = LAGrammar.g4
 MAIN_SCRIPT = main.py
 INPUT_FILE = in.txt
