@@ -1,31 +1,18 @@
-{ determinar, dados os comprimentos dos lados de um triângulo, se o triângulo pode ser formado (se existe) e qual o tipo dele (equilátero, isósceles ou escaleno) }
+{ dados, separadamente, prenome e sobrenome, escrevê-los em dois formatos: "Fulano Tal" e "Tal, F." }
 
 algoritmo
-	declare
-		lado1, lado2, lado3: real
-	declare
-		existeTriangulo,
-		ehEquilatero, ehIsosceles, ehEscaleno: logico
+	declare prenome, sobrenome,
+		formato1, formato2: literal
 
-	{ leitura dos comprimentos dos lados }
-	leia(lado1, lado2, lado3)
+	{ obtenção dos nomes }
+	leia(prenome, sobrenome)
 
-	{ verificações necessárias }
-	existeTriangulo <- lado1 < lado2 + lado3 e
-	lado2 < lado1 + lado3 e
-	lado3 < lado1 + lado2
-	
-	ehEquilatero <- existeTriangulo e lado1 = lado2 e lado2 = lado3
-
-	ehIsosceles <- existeTriangulo e nao ehEquilatero e
-	(lado1 = lado2 ou lado2 = lado3  lado1 = lado3)
-
-	ehEscaleno <- existeTriangulo e nao ehEquilatero e nao ehIsosceles
+	{ composição dos nomes }
+	formato1 <- prenome + " " + sobrenome
+	formato2 <- sobrenome + ", " + 1
 
 	{ resultados }
-	escreva("Triangulo existe?", existeTriangulo)
-	escreva("Eh equilatero?", ehEquilatero)
-	escreva("Eh isosceles?", ehIsosceles)
-	escreva("Eh escaleno?", ehEscaleno)
+	escreva(formato1)
+	escreva(formato2)
 
 fim_algoritmo

@@ -51,10 +51,11 @@ class Lexer:
         input_stream = InputStream(input)
         self.lexer = LAGrammarLexer(input_stream)
         self.lexer.reset()
-        tokens = CommonTokenStream(self.lexer)
 
         for token in self.lexer.getAllTokens():
             rule = self.lexer.ruleNames[token.type - 1]
+
+            # print(token, rule)
 
             if rule in self.error_messages:
                 raise SyntaxError(self.__format_error(token))
