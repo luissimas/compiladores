@@ -1,3 +1,2 @@
-Linha 11: Tipos incompatíveis na atribuição. Esperado: literal, Encontrado: None
-Linha 12: Tipos incompatíveis na atribuição. Esperado: literal, Encontrado: None
+
 Fim da compilacao

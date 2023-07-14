@@ -8,7 +8,7 @@ algoritmo
 	leia(prenome, sobrenome)
 
 	{ composição dos nomes }
-	formato1 <- prenome + " " + sobrenome
+	formato1 <- prenome + " " + sobrenome + "aslkdjf"
 	formato2 <- sobrenome + ", " + 1
 
 	{ resultados }

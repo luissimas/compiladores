@@ -7,7 +7,7 @@ from LAGrammarParser import LAGrammarParser
 from scope import Scope, SymbolAlreadyDefinedException
 
 
-class Jander(LAGrammarVisitor):
+class Alguma(LAGrammarVisitor):
     def __init__(self):
         self.errors = []
         self.scope = Scope()
@@ -16,7 +16,7 @@ class Jander(LAGrammarVisitor):
     @override
     def visitPrograma(self, ctx: LAGrammarParser.ProgramaContext) -> str:
         super().visitPrograma(ctx)
-        return self._printErrors()
+        return self.__printErrors()
 
     @override
     def visitDeclaracoes(self, ctx: LAGrammarParser.DeclaracoesContext):
@@ -36,17 +36,14 @@ class Jander(LAGrammarVisitor):
         type = ctx.tipo().getText()
         line = ctx.start.line
 
-        if not self._checkType(type, line):
+        if not self.__checkType(type, line):
             return super().visitVariavel(ctx)
 
         for identifier in ctx.identificador():
             key = identifier.getText()
             line = identifier.start.line
             try:
-                self.scope.add(
-                    key,
-                    type,
-                )
+                self.scope.add(key, type)
 
             except SymbolAlreadyDefinedException:
                 self.errors.append(
@@ -57,7 +54,7 @@ class Jander(LAGrammarVisitor):
     def visitCmdLeia(self, ctx: LAGrammarParser.CmdLeiaContext):
         for identifier in ctx.identificador():
             line = identifier.start.line
-            self._checkDeclaredIdentifier(identifier, line)
+            self.__checkDeclaredIdentifier(identifier, line)
 
     @override
     def visitCmdEscreva(self, ctx: LAGrammarParser.CmdEscrevaContext):
@@ -65,6 +62,11 @@ class Jander(LAGrammarVisitor):
 
     @override
     def visitCmdAtribuicao(self, ctx: LAGrammarParser.CmdAtribuicaoContext):
+        identificador = ctx.identificador()  # Tipo do identificador alvo
+        expressao = ctx.expressao()  # Tipo da expressão
+
+        # TODO: comparar tipo do identificador com o tipo da expressão
+
         return super().visitCmdAtribuicao(ctx)
 
     @override
@@ -73,21 +75,56 @@ class Jander(LAGrammarVisitor):
 
         if identifier:
             line = identifier.start.line
-            self._checkDeclaredIdentifier(identifier, line)
+            self.__checkDeclaredIdentifier(identifier, line)
+
+        if ctx.NUM_INT():
+            return "int"
+
+        if ctx.NUM_REAL():
+            return "real"
+
+        if ctx.expressao():
+            return self.visitExpressao(ctx.expressao())
 
         return super().visitParcela_unario(ctx)
 
-    def _checkType(self, type: str, line) -> bool:
+    @override
+    def visitParcela_nao_unario(self, ctx: LAGrammarParser.Parcela_nao_unarioContext):
+        if ctx.CADEIA():
+            return "cadeia"
+
+        return super().visitParcela_unario(ctx)
+
+    @override
+    def visitExp_aritmetica(self, ctx: LAGrammarParser.Exp_aritmeticaContext):
+        for termo in ctx.termo():
+            # TODO: agregar tipos
+            result = self.visitTermo(termo)
+            print(result)
+
+        print("\n")
+        return super().visitExp_aritmetica(ctx)
+
+    @override
+    def visitIdentificador(self, ctx: LAGrammarParser.IdentificadorContext):
+        identificador = ctx.IDENT()[0]
+
+        # TODO: retornar tipo do identificador
+        print("Identificador: ", identificador)
+
+        return super().visitIdentificador(ctx)
+
+    def __checkType(self, type: str, line) -> bool:
         if type not in self.validTypes:
             self.errors.append(f"Linha {line}: tipo {type} nao declarado")
             return False
 
         return True
 
-    def _printErrors(self) -> str:
+    def __printErrors(self) -> str:
         return "\n".join(self.errors)
 
-    def _checkDeclaredIdentifier(self, identifier, line):
+    def __checkDeclaredIdentifier(self, identifier, line):
         text = identifier.getText()
         symbol = self.scope.find(text)
 
