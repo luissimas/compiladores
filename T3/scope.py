@@ -18,7 +18,7 @@ class Symbol:
         self.value = value
 
     def __repr__(self) -> str:
-        return f"({self.type}, {self.value})"
+        return f"Symbol(type={self.type}, value={self.value})"
 
 
 class Scope:

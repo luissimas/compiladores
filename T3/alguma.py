@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 
-from typing_extensions import override
 
-from LAGrammarVisitor import LAGrammarVisitor
 from LAGrammarParser import LAGrammarParser
+from LAGrammarVisitor import LAGrammarVisitor
 from scope import Scope, SymbolAlreadyDefinedException
 
 
@@ -13,25 +12,20 @@ class Alguma(LAGrammarVisitor):
         self.scope = Scope()
         self.validTypes = ["inteiro", "literal", "real", "logico"]
 
-    @override
     def visitPrograma(self, ctx: LAGrammarParser.ProgramaContext) -> str:
         super().visitPrograma(ctx)
         return self.__printErrors()
 
-    @override
     def visitDeclaracoes(self, ctx: LAGrammarParser.DeclaracoesContext):
         return super().visitDeclaracoes(ctx)
 
-    @override
     def visitCorpo(self, ctx: LAGrammarParser.CorpoContext):
         self.scope.newScope()
         return super().visitCorpo(ctx)
 
-    @override
     def visitDeclaracao_local(self, ctx: LAGrammarParser.Declaracao_localContext):
         return super().visitDeclaracao_local(ctx)
 
-    @override
     def visitVariavel(self, ctx: LAGrammarParser.VariavelContext):
         type = ctx.tipo().getText()
         line = ctx.start.line
@@ -50,69 +44,98 @@ class Alguma(LAGrammarVisitor):
                     f"Linha {line}: identificador {key} ja declarado anteriormente"
                 )
 
-    @override
     def visitCmdLeia(self, ctx: LAGrammarParser.CmdLeiaContext):
         for identifier in ctx.identificador():
             line = identifier.start.line
             self.__checkDeclaredIdentifier(identifier, line)
 
-    @override
     def visitCmdEscreva(self, ctx: LAGrammarParser.CmdEscrevaContext):
         super().visitCmdEscreva(ctx)
 
-    @override
     def visitCmdAtribuicao(self, ctx: LAGrammarParser.CmdAtribuicaoContext):
-        identificador = ctx.identificador()  # Tipo do identificador alvo
-        expressao = ctx.expressao()  # Tipo da expressão
+        identificador = ctx.identificador().getText()
+        tipo_identificador = self.__getIdentificadorType(
+            ctx.identificador()
+        )  # Tipo do identificador alvo
+        tipo_expressao = self.__getExpressaoType(ctx.expressao())  # Tipo da expressão
 
-        # TODO: comparar tipo do identificador com o tipo da expressão
-
+        self.__checkAttributionType(
+            identificador, tipo_identificador, tipo_expressao, ctx.start.line
+        )
         return super().visitCmdAtribuicao(ctx)
 
-    @override
-    def visitParcela_unario(self, ctx: LAGrammarParser.Parcela_unarioContext):
+    def __getExpressaoType(self, ctx: LAGrammarParser.ExpressaoContext):
+        exp = (
+            ctx.termo_logico()
+            .fator_logico()[0]
+            .parcela_logica()
+            .exp_relacional()
+            .exp_aritmetica()[0]
+        )
+        if exp:
+            return self.__getExp_aritmeticaType(exp)
+
+    def __getExp_aritmeticaType(self, ctx: LAGrammarParser.Exp_aritmeticaContext):
+        types = []
+
+        for termo in ctx.termo():
+            types += self.__getTermoType(termo)
+
+        return types
+
+    def __getTermoType(self, ctx: LAGrammarParser.TermoContext):
+        types = []
+
+        for fator in ctx.fator():
+            types += self.__getFatorType(fator)
+
+        return types
+
+    def __getFatorType(self, ctx: LAGrammarParser.FatorContext):
+        types = []
+
+        for parcela in ctx.parcela():
+            types += self.__getParcelaType(parcela)
+
+        return types
+
+    def __getParcelaType(self, ctx: LAGrammarParser.ParcelaContext):
+        if ctx.parcela_unario():
+            return self.__getParcela_unarioType(ctx.parcela_unario())
+
+        if ctx.parcela_nao_unario():
+            return self.__getParcela_nao_unarioType(ctx.parcela_nao_unario())
+
+    def __getParcela_unarioType(self, ctx: LAGrammarParser.Parcela_unarioContext):
         identifier = ctx.identificador()
 
         if identifier:
             line = identifier.start.line
             self.__checkDeclaredIdentifier(identifier, line)
+            return [self.__getIdentificadorType(identifier)]
 
         if ctx.NUM_INT():
-            return "int"
+            return ["int"]
 
         if ctx.NUM_REAL():
-            return "real"
+            return ["real"]
 
         if ctx.expressao():
-            return self.visitExpressao(ctx.expressao())
+            return self.__getExpressaoType(ctx.expressao()[0])
 
-        return super().visitParcela_unario(ctx)
-
-    @override
-    def visitParcela_nao_unario(self, ctx: LAGrammarParser.Parcela_nao_unarioContext):
+    def __getParcela_nao_unarioType(
+        self, ctx: LAGrammarParser.Parcela_nao_unarioContext
+    ):
         if ctx.CADEIA():
-            return "cadeia"
+            return ["literal"]
 
-        return super().visitParcela_unario(ctx)
+    def __getIdentificadorType(self, ctx: LAGrammarParser.IdentificadorContext):
+        identificador = str(ctx.IDENT()[0])
 
-    @override
-    def visitExp_aritmetica(self, ctx: LAGrammarParser.Exp_aritmeticaContext):
-        for termo in ctx.termo():
-            # TODO: agregar tipos
-            result = self.visitTermo(termo)
-            print(result)
+        symbol = self.scope.find(identificador)
 
-        print("\n")
-        return super().visitExp_aritmetica(ctx)
-
-    @override
-    def visitIdentificador(self, ctx: LAGrammarParser.IdentificadorContext):
-        identificador = ctx.IDENT()[0]
-
-        # TODO: retornar tipo do identificador
-        print("Identificador: ", identificador)
-
-        return super().visitIdentificador(ctx)
+        if symbol:
+            return symbol.type
 
     def __checkType(self, type: str, line) -> bool:
         if type not in self.validTypes:
@@ -130,3 +153,11 @@ class Alguma(LAGrammarVisitor):
 
         if not symbol:
             self.errors.append(f"Linha {line}: identificador {text} nao declarado")
+
+    def __checkAttributionType(
+        self, identifier, identifier_type, expression_types, line
+    ):
+        if not all(type == identifier_type for type in expression_types):
+            self.errors.append(
+                f"Linha {line}: atribuicao nao compativel para {identifier}"
+            )

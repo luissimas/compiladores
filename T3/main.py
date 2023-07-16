@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 
+from parser import Parser
 from sys import argv
 
-from antlr4 import CommonTokenStream
-from lexer import Lexer
-from parser import Parser
 from alguma import Alguma
+from lexer import Lexer
 
 
 def run_script():
