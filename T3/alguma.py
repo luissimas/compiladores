@@ -52,6 +52,10 @@ class Alguma(LAGrammarVisitor):
 
         super().visitCmdEscreva(ctx)
 
+    def visitCmdEnquanto(self, ctx: LAGrammarParser.CmdEnquantoContext):
+        self.__getExpressaoType(ctx.expressao())
+        super().visitCmdEnquanto(ctx)
+
     def visitCmdAtribuicao(self, ctx: LAGrammarParser.CmdAtribuicaoContext):
         identificador = ctx.identificador().getText()
         tipo_identificador = self.__getIdentificadorType(
@@ -81,19 +85,25 @@ class Alguma(LAGrammarVisitor):
             return self.__getExp_relacionalType(ctx.exp_relacional())
 
     def __getExp_relacionalType(self, ctx: LAGrammarParser.Exp_relacionalContext):
-        exp_aritmetica = ctx.exp_aritmetica()
+        types = [self.__getExp_aritmeticaType(exp) for exp in ctx.exp_aritmetica()]
 
-        if len(exp_aritmetica) == 1:
-            return self.__getExp_aritmeticaType(exp_aritmetica[0])
+        # If there are more than one expression, then it is a logical expression,
+        # which always has the type "logico"
+        if len(types) > 1:
+            return "logico"
 
-        return "logico"
+        return types
 
     def __getExp_aritmeticaType(self, ctx: LAGrammarParser.Exp_aritmeticaContext):
         types = [self.__getTermoType(termo) for termo in ctx.termo()]
         return types
 
     def __getTermoType(self, ctx: LAGrammarParser.TermoContext):
-        types = [self.__getFatorType(fator) for fator in ctx.fator()]
+        types = flatten_list([self.__getFatorType(fator) for fator in ctx.fator()])
+
+        # Coerce integers to real numbers on multiplication and division
+        if len(ctx.op2()) > 0 and all(type in ["real", "inteiro"] for type in types):
+            return "real"
 
         return types
 
@@ -117,7 +127,7 @@ class Alguma(LAGrammarVisitor):
             return self.__getIdentificadorType(identifier)
 
         if ctx.NUM_INT():
-            return "int"
+            return "inteiro"
 
         if ctx.NUM_REAL():
             return "real"
@@ -159,10 +169,17 @@ class Alguma(LAGrammarVisitor):
     def __checkAttributionType(
         self, identifier, identifier_type, expression_types, line
     ):
-        if not all(type == identifier_type for type in expression_types):
+        if not all(is_coercible(identifier_type, type) for type in expression_types):
             self.errors.append(
                 f"Linha {line}: atribuicao nao compativel para {identifier}"
             )
+
+
+def is_coercible(type_a, type_b):
+    if type_a == "real" and type_b == "inteiro":
+        return True
+
+    return type_a == type_b
 
 
 def flatten_list(nested_list):
