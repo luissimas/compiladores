@@ -1,3 +1,2 @@
-Linha 7: identificador lado1 ja declarado anteriormente
-Linha 14: atribuicao nao compativel para existeTriangulo
+Linha 21: atribuicao nao compativel para classificacao
 Fim da compilacao

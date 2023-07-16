@@ -16,9 +16,6 @@ class Alguma(LAGrammarVisitor):
         super().visitPrograma(ctx)
         return self.__printErrors()
 
-    def visitDeclaracoes(self, ctx: LAGrammarParser.DeclaracoesContext):
-        return super().visitDeclaracoes(ctx)
-
     def visitCorpo(self, ctx: LAGrammarParser.CorpoContext):
         self.scope.newScope()
         return super().visitCorpo(ctx)
@@ -30,12 +27,12 @@ class Alguma(LAGrammarVisitor):
         type = ctx.tipo().getText()
         line = ctx.start.line
 
-        if not self.__checkType(type, line):
-            return super().visitVariavel(ctx)
+        self.__checkType(type, line)
 
         for identifier in ctx.identificador():
             key = identifier.getText()
             line = identifier.start.line
+
             try:
                 self.scope.add(key, type)
 
@@ -50,6 +47,9 @@ class Alguma(LAGrammarVisitor):
             self.__checkDeclaredIdentifier(identifier, line)
 
     def visitCmdEscreva(self, ctx: LAGrammarParser.CmdEscrevaContext):
+        for expressao in ctx.expressao():
+            self.__getExpressaoType(expressao)
+
         super().visitCmdEscreva(ctx)
 
     def visitCmdAtribuicao(self, ctx: LAGrammarParser.CmdAtribuicaoContext):
@@ -57,7 +57,9 @@ class Alguma(LAGrammarVisitor):
         tipo_identificador = self.__getIdentificadorType(
             ctx.identificador()
         )  # Tipo do identificador alvo
-        tipo_expressao = self.__getExpressaoType(ctx.expressao())  # Tipo da expressão
+        tipo_expressao = flatten_list(
+            self.__getExpressaoType(ctx.expressao())
+        )  # Tipo da expressão
 
         self.__checkAttributionType(
             identificador, tipo_identificador, tipo_expressao, ctx.start.line
@@ -65,38 +67,38 @@ class Alguma(LAGrammarVisitor):
         return super().visitCmdAtribuicao(ctx)
 
     def __getExpressaoType(self, ctx: LAGrammarParser.ExpressaoContext):
-        exp = (
-            ctx.termo_logico()
-            .fator_logico()[0]
-            .parcela_logica()
-            .exp_relacional()
-            .exp_aritmetica()[0]
-        )
-        if exp:
-            return self.__getExp_aritmeticaType(exp)
+        types = [
+            self.__getFator_logicoType(fator_logico)
+            for fator_logico in ctx.termo_logico().fator_logico() + ctx.fator_logico()
+        ]
+        return types
+
+    def __getFator_logicoType(self, ctx: LAGrammarParser.Fator_logicoContext):
+        return self.__getParcela_logicaType(ctx.parcela_logica())
+
+    def __getParcela_logicaType(self, ctx: LAGrammarParser.Parcela_logicaContext):
+        if ctx.exp_relacional():
+            return self.__getExp_relacionalType(ctx.exp_relacional())
+
+    def __getExp_relacionalType(self, ctx: LAGrammarParser.Exp_relacionalContext):
+        exp_aritmetica = ctx.exp_aritmetica()
+
+        if len(exp_aritmetica) == 1:
+            return self.__getExp_aritmeticaType(exp_aritmetica[0])
+
+        return "logico"
 
     def __getExp_aritmeticaType(self, ctx: LAGrammarParser.Exp_aritmeticaContext):
-        types = []
-
-        for termo in ctx.termo():
-            types += self.__getTermoType(termo)
-
+        types = [self.__getTermoType(termo) for termo in ctx.termo()]
         return types
 
     def __getTermoType(self, ctx: LAGrammarParser.TermoContext):
-        types = []
-
-        for fator in ctx.fator():
-            types += self.__getFatorType(fator)
+        types = [self.__getFatorType(fator) for fator in ctx.fator()]
 
         return types
 
     def __getFatorType(self, ctx: LAGrammarParser.FatorContext):
-        types = []
-
-        for parcela in ctx.parcela():
-            types += self.__getParcelaType(parcela)
-
+        types = [self.__getParcelaType(parcela) for parcela in ctx.parcela()]
         return types
 
     def __getParcelaType(self, ctx: LAGrammarParser.ParcelaContext):
@@ -112,13 +114,13 @@ class Alguma(LAGrammarVisitor):
         if identifier:
             line = identifier.start.line
             self.__checkDeclaredIdentifier(identifier, line)
-            return [self.__getIdentificadorType(identifier)]
+            return self.__getIdentificadorType(identifier)
 
         if ctx.NUM_INT():
-            return ["int"]
+            return "int"
 
         if ctx.NUM_REAL():
-            return ["real"]
+            return "real"
 
         if ctx.expressao():
             return self.__getExpressaoType(ctx.expressao()[0])
@@ -161,3 +163,15 @@ class Alguma(LAGrammarVisitor):
             self.errors.append(
                 f"Linha {line}: atribuicao nao compativel para {identifier}"
             )
+
+
+def flatten_list(nested_list):
+    flattened = []
+
+    for item in nested_list:
+        if isinstance(item, list):
+            flattened.extend(flatten_list(item))
+        else:
+            flattened.append(item)
+
+    return flattened
