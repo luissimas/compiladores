@@ -4,9 +4,14 @@
 from LAGrammarParser import LAGrammarParser
 from LAGrammarVisitor import LAGrammarVisitor
 from scope import Scope, SymbolAlreadyDefinedException
+from utils import flatten_list, is_coercible
 
 
 class Alguma(LAGrammarVisitor):
+    """
+    Classe responsável por visitar e analisar a estrutura de um programa na linguagem 'Alguma'.
+    """
+
     def __init__(self):
         self.errors = []
         self.scope = Scope()
@@ -173,22 +178,3 @@ class Alguma(LAGrammarVisitor):
             self.errors.append(
                 f"Linha {line}: atribuicao nao compativel para {identifier}"
             )
-
-
-def is_coercible(type_a, type_b):
-    if type_a == "real" and type_b == "inteiro":
-        return True
-
-    return type_a == type_b
-
-
-def flatten_list(nested_list):
-    flattened = []
-
-    for item in nested_list:
-        if isinstance(item, list):
-            flattened.extend(flatten_list(item))
-        else:
-            flattened.append(item)
-
-    return flattened
