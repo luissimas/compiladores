@@ -3,6 +3,7 @@ GRAMMAR_FILE = LAGrammar.g4
 MAIN_SCRIPT = main.py
 INPUT_FILE = in.txt
 OUTPUT_FILE = out.txt
+PY_FILES = $(wildcard *.py)
 
 all: compile
 
@@ -11,7 +12,7 @@ clean:
 
 compile: $(OUTPUT_FILE)
 
-$(OUTPUT_FILE): $(INPUT_FILE) $(GRAMMAR_FILE)
+$(OUTPUT_FILE): $(INPUT_FILE) $(GRAMMAR_FILE) $(PY_FILES)
 		@$(GENERATE_PARSER_COMMAND)
 
 test: compile
