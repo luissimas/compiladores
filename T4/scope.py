@@ -18,6 +18,9 @@ class Symbol:
         self.value = value
 
     def __repr__(self) -> str:
+        if self.type == None:
+            return f"Symbol(type={self.type}, register_type={self.type}, value={self.value})"
+        
         return f"Symbol(type={self.type.tipoBasico}, register_type={self.type.tipoRegistro}, value={self.value})"
 
 

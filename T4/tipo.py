@@ -3,7 +3,7 @@ from LAGrammarParser import LAGrammarParser
 class TipoVariavel:
     validTypes = ["inteiro", "literal", "real", "logico", "ponteiro", "registro"]
 
-    def __init__(self, ctx: LAGrammarParser.VariavelContext):
+    def __init__(self, extraTypes, ctx: LAGrammarParser.VariavelContext):
         line = ctx.start.line
         type = ctx.tipo().getText()
 
@@ -15,6 +15,9 @@ class TipoVariavel:
         if ctx.tipo().registro():
             self.tipoBasico = "registro"
             self.tipoRegistro = self.__getRegistroType(ctx.tipo().registro())
+        elif type in extraTypes:
+            self.tipoBasico = extraTypes[type].tipoBasico
+            self.tipoRegistro = extraTypes[type].tipoRegistro
         # senao eh so tipo basico
         else:
             self.__checkType(type, line)

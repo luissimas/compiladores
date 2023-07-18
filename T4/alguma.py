@@ -15,6 +15,7 @@ class Alguma(LAGrammarVisitor):
     def __init__(self):
         self.errors = []
         self.scope = Scope()
+        self.extraTypes = {}
 
     def visitPrograma(self, ctx: LAGrammarParser.ProgramaContext) -> str:
         super().visitPrograma(ctx)
@@ -23,11 +24,21 @@ class Alguma(LAGrammarVisitor):
     def visitCorpo(self, ctx: LAGrammarParser.CorpoContext):
         self.scope.newScope()
         return super().visitCorpo(ctx)
+    
+    def visitDeclaracao_local(self, ctx: LAGrammarParser.Declaracao_localContext):
+        if str(ctx.children[0]) == "tipo":
+            nome_tipo = ctx.IDENT().getText()
+            type = TipoVariavel(self.extraTypes, ctx)
+            self.extraTypes[nome_tipo] = type
+            # adiciona tipo ao escopo tambem
+            self.scope.add(nome_tipo, type)
+
+        return super().visitDeclaracao_local(ctx)
 
     def visitVariavel(self, ctx: LAGrammarParser.VariavelContext):
         type = None
         try:
-            type = TipoVariavel(ctx)
+            type = TipoVariavel(self.extraTypes, ctx)
         except TypeError as error:
             self.errors.append(str(error))
 
@@ -157,11 +168,12 @@ class Alguma(LAGrammarVisitor):
         symbol = self.scope.find(identificador)
 
         if symbol:
+            # se tiver mais de um identificador e ele tiver sido atribuido
             if len(ctx.IDENT()) > 1:
                 # pega o proximo atributo de identificador
                 segundo_ident = ctx.IDENT()[1].getText()
                 # retorna o tipo desse atributo
-                return symbol.type.tipoRegistro[segundo_ident]
+                return symbol.type.tipoRegistro[segundo_ident] if symbol.type else ""
             
             return symbol.type.tipoBasico if symbol.type else ""
 
@@ -173,9 +185,16 @@ class Alguma(LAGrammarVisitor):
         symbol = self.scope.find(text)
 
         if not symbol:
-            self.errors.append(f"Linha {line}: identificador {text} nao declarado")
+            self.errors.append(f"Linha {line}: identificador {identifier.getText()} nao declarado")
+            return
+        
+        if len(identifier.IDENT()) > 1:
+            # pega o proximo atributo de identificador
+            segundo_ident = identifier.IDENT()[1].getText()
+            # retorna o tipo desse atributo
+            if segundo_ident not in symbol.type.tipoRegistro:
+                self.errors.append(f"Linha {line}: identificador {identifier.getText()} nao declarado")
 
-        #for i in identifier.IDENT()[1:]:
 
     def __checkAttributionType(
         self, identifier, identifier_type, expression_types, line
