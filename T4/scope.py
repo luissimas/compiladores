@@ -31,6 +31,9 @@ class Scope:
     def newScope(self):
         self.stack.append({})
 
+    def getScopes(self):
+        return self.stack
+
     def peek(self):
         return self.stack[-1]
 
@@ -53,9 +56,6 @@ class Scope:
         else:
             current_scope[key].setValue(value)
 
-    def getScopes(self):
-        return self.stack
-
     def find(self, key: str) -> Symbol | None:
         for scope in self.stack:
             if key in scope:
@@ -63,5 +63,11 @@ class Scope:
 
                 if symbol:
                     return symbol
-
+        return None
+    
+    def findGlobalDecl(self, key: str) -> Symbol | None:
+        for scope in self.stack:
+            if key in scope:
+                if scope[key].type.tipoBasico == "funcao" or scope[key].type.tipoBasico == "procedimento":
+                    return scope
         return None

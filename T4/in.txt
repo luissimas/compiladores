@@ -1,59 +1,30 @@
-{ exemplificacao de sub-rotinas na forma de funcao e seu uso }
+{ dados o nome, o preço e o tipo dos vinhos (indicados aqui por "T" para tinto, "B" para branco ou "R" para rosê, descrever o vinho mais caro; não são considerados vinhos de preços iguais; fim dos dados indicado por nome = "fim" }
 
-funcao menorInteiro(valor1: inteiro, valor2: inteiro): inteiro
-{ retorna o menor entre valor1 e valor2; se iguais retorna um deles }
-
-      se valor1 < valor2 entao
-           retorne valor1
-      senao
-           retorne valor2
-      fim_se
-fim_funcao
-
-funcao menorReal(valor1: real, valor2: real): real
-{ retorna o menor entre valor1 e valor2; se iguais, retorna um deles }
-
-      se valor1 < valor2 entao
-           retorne valor1
-      senao
-           retorne valor2
-      fim_se
-fim_funcao
-
-funcao modulo(valor: real): real
-{ retorna o valor absoluto do valor }
-
-      se valor < 0 entao
-           valor <- -valor
-      fim_se
-      retorne valor
-fim_funcao
-
-{ parte principal }
 algoritmo
-      declare
-           primeiroInt, segundoInt: inteiro
-		declare
-           primeiroReal, segundoReal: real
+	tipo tVinho: registro
+						nome,
+						tipoVinho: literal
+						preco: real
+					fim_registro
+	declare
+		tVinho, vinho, vinhoCaro: tVinho
 
-      { entrada de dados }
-      leia(primeiroInt, segundoInt, primeiroReal, segundoReal)
+	{ repetição para leitura dos dados }
+	vinhoCaro.preco <- -1 	{ para forçar a troca na primeira vez }
+	faca	
+		{ dados }
+		leia(vinho.nome, vinho.Preco, vinho.tipoVinho)
 
-      { algumas saidas e manipulacoes }
-      escreva("O menor inteiro entre", primeiroInt, "e", 
-                segundoInt, "eh", menorInteiro(primeiroInt))
+		{ verificação do maior preço }
+		se vinho.preco > vinhoCaro.preco e vinho.nome <> "fim" entao
+			vinhoCaro <- vinho 		{ copia tudo }
+		fim_se
+	ate vinho.nome = "fim"
 
-      se menorReal(primeiroReal, segundoInt) <> primeiroReal entao
-           escreva(segundoReal, "eh menor que", primeiroReal)
-      fim_se
-
-      se modulo(primeiroReal) = primeiroReal e primeiroReal <> 0 entao
-           escreva("O valor", primeiroReal, "eh positivo")
-      senao
-           escreva("O valor", primeiroReal, "nao eh positivo")
-      fim_se
-
-      escreva("Considerando-se o modulo, tem-se que o menor entre",
-                primeiroReal, "e", segundoReal, "eh", 
-                menorReal(modulo(primeiroReal), modulo(segundoReal)))
+	{ apresentação do resultado }
+	se vinhoCaro.preco = -1 entao
+		escreva("Nenhum vinho foi apresentado.")
+	senao
+		escreva(vinhoCaro.nome, vinhoCaro.preco, vinhocaro.tipoVinho)
+	fim_se
 fim_algoritmo
