@@ -1,18 +1,26 @@
 from LAGrammarParser import LAGrammarParser
 
 class TipoVariavel:
-    validTypes = ["inteiro", "literal", "real", "logico", "ponteiro", "registro"]
+    validTypes = ["inteiro", "literal", "real", "logico", "ponteiro", "registro", "funcao", "procedimento"]
 
-    def __init__(self, extraTypes, ctx: LAGrammarParser.VariavelContext):
+    def __init__(self, extraTypes, ctx: LAGrammarParser.VariavelContext|LAGrammarParser.ParametroContext):
         line = ctx.start.line
-        type = ctx.tipo().getText()
+
+        if isinstance(ctx, LAGrammarParser.Declaracao_globalContext):
+            type_obj = ctx.children[0]
+        elif isinstance(ctx, LAGrammarParser.VariavelContext):
+            type_obj = ctx.tipo()
+        else:
+            type_obj = ctx.tipo_estendido()
+
+        type_name = type_obj.getText()
 
         # verifica se eh ponteiro
-        if type.startswith("^"):
-            type = "ponteiro"
+        if type_name.startswith("^"):
+            type_name = "ponteiro"
 
         # verifica se eh registro
-        if ctx.tipo().registro():
+        if isinstance(ctx, LAGrammarParser.VariavelContext) and type_obj.registro():
             self.tipoBasico = "registro"
             self.tipoRegistro = self.__getRegistroType(ctx.tipo().registro())
         elif type in extraTypes:
@@ -20,8 +28,9 @@ class TipoVariavel:
             self.tipoRegistro = extraTypes[type].tipoRegistro
         # senao eh so tipo basico
         else:
-            self.__checkType(type, line)
-            self.tipoBasico = type
+            self.__checkType(type_name, line)
+            self.tipoBasico = type_name
+            self.tipoRegistro = None
 
     def __checkType(self, type: str, line) -> bool:
         if type not in self.validTypes:

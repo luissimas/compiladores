@@ -53,6 +53,9 @@ class Scope:
         else:
             current_scope[key].setValue(value)
 
+    def getScopes(self):
+        return self.stack
+
     def find(self, key: str) -> Symbol | None:
         for scope in self.stack:
             if key in scope:

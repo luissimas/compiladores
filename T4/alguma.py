@@ -25,13 +25,93 @@ class Alguma(LAGrammarVisitor):
         self.scope.newScope()
         return super().visitCorpo(ctx)
     
+    def visitDeclaracao_global(self, ctx: LAGrammarParser.Declaracao_globalContext):
+        self.scope.newScope()
+        nome_funcao = ctx.IDENT().getText()
+
+        line = ctx.start.line
+
+        tipo_decl_global = TipoVariavel(self.extraTypes, ctx)
+        #tipo_decl_global.tipoBasico = ctx.children[0]
+
+        try:
+            # adiciona tipo ao escopo tambem
+            self.scope.add(nome_funcao, tipo_decl_global)
+
+        except SymbolAlreadyDefinedException:
+            self.errors.append(
+                f"Linha {line}: identificador {nome_funcao} ja declarado anteriormente"
+            )
+
+        self.__setParametros(ctx.parametros())
+
+        tipo_funcao = ctx.tipo_estendido().getText()
+        tipo_retorno = flatten_list(
+            self.__getCmdType(ctx.cmd())
+        )
+
+        self.__checkReturnType(
+            nome_funcao, tipo_funcao, tipo_retorno, ctx.start.line
+        )
+
+        return super().visitDeclaracao_global(ctx)
+    
+    def __setParametros(self, ctx: LAGrammarParser.ParametrosContext):
+        for p in ctx.parametro():
+            self.__setParametro(p)
+
+    def __setParametro(self, ctx: LAGrammarParser.ParametroContext):   
+        try:
+            type = TipoVariavel(self.extraTypes, ctx)
+        except TypeError as error:
+            self.errors.append(str(error))
+
+        for identifier in ctx.identificador():
+            key = identifier.getText()
+            line = identifier.start.line
+
+            try:
+                self.scope.add(key, type)
+
+            except SymbolAlreadyDefinedException:
+                self.errors.append(
+                    f"Linha {line}: identificador {key} ja declarado anteriormente"
+                )
+
+    def __getCmdType(self, ctx: LAGrammarParser.CmdContext):
+        types = []
+        for cmd in ctx:
+            if cmd.cmdSe():
+                types.append(self.__getCmdSeType(cmd.cmdSe()))
+            if cmd.cmdRetorne():
+                types.append(self.__getCmdRetorneType(cmd.cmdRetorne()))
+        return types
+    
+    def __getCmdSeType(self, ctx: LAGrammarParser.CmdSeContext):
+        if ctx.cmd():
+            types  = flatten_list(self.__getCmdType(ctx.cmd()))
+        return types
+
+    def __getCmdRetorneType(self, ctx: LAGrammarParser.CmdRetorneContext):
+        # Tipo da expressão
+        tipo_retorno = flatten_list(self.__getExpressaoType(ctx.expressao()))  
+        return tipo_retorno
+    
     def visitDeclaracao_local(self, ctx: LAGrammarParser.Declaracao_localContext):
         if str(ctx.children[0]) == "tipo":
             nome_tipo = ctx.IDENT().getText()
             type = TipoVariavel(self.extraTypes, ctx)
-            self.extraTypes[nome_tipo] = type
-            # adiciona tipo ao escopo tambem
-            self.scope.add(nome_tipo, type)
+            self.extraTypes[nome_tipo] = type 
+
+            line = ctx.start.line          
+            try:
+                # adiciona tipo ao escopo tambem
+                self.scope.add(nome_tipo, type)
+
+            except SymbolAlreadyDefinedException:
+                self.errors.append(
+                    f"Linha {line}: identificador {nome_tipo} ja declarado anteriormente"
+                )
 
         return super().visitDeclaracao_local(ctx)
 
@@ -202,4 +282,12 @@ class Alguma(LAGrammarVisitor):
         if not all(is_coercible(identifier_type, type) for type in expression_types):
             self.errors.append(
                 f"Linha {line}: atribuicao nao compativel para {identifier}"
+            )
+    
+    def __checkReturnType(
+        self, function_name, function_type, return_types, line
+    ):
+        if not all(is_coercible(function_type, type) for type in return_types):
+            self.errors.append(
+                f"Linha {line}: incompatibilidade de parametros na chamada de {function_name}"
             )
