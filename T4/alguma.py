@@ -35,7 +35,7 @@ class Alguma(LAGrammarVisitor):
 
         try:
             # adiciona tipo ao escopo tambem
-            self.scope.add(nome_funcao, tipo_decl_global)
+            self.scope.add(nome_funcao, tipo_decl_global, 0)
 
         except SymbolAlreadyDefinedException:
             self.errors.append(
@@ -59,7 +59,7 @@ class Alguma(LAGrammarVisitor):
         for p in ctx.parametro():
             self.__setParametro(p)
 
-    def __setParametro(self, ctx: LAGrammarParser.ParametroContext):   
+    def __setParametro(self, ctx: LAGrammarParser.ParametroContext):
         try:
             type = TipoVariavel(self.extraTypes, ctx)
         except TypeError as error:
@@ -69,8 +69,13 @@ class Alguma(LAGrammarVisitor):
             key = identifier.getText()
             line = identifier.start.line
 
+            dimensao = 0
+            if self.__isVariableList(identifier):
+                dimensao = 1
+                key = str(identifier.IDENT()[0])
+
             try:
-                self.scope.add(key, type)
+                self.scope.add(key, type, dimensao)
 
             except SymbolAlreadyDefinedException:
                 self.errors.append(
@@ -105,7 +110,7 @@ class Alguma(LAGrammarVisitor):
             line = ctx.start.line          
             try:
                 # adiciona tipo ao escopo tambem
-                self.scope.add(nome_tipo, type)
+                self.scope.add(nome_tipo, type, 0)
 
             except SymbolAlreadyDefinedException:
                 self.errors.append(
@@ -125,8 +130,13 @@ class Alguma(LAGrammarVisitor):
             key = identifier.getText()
             line = identifier.start.line
 
+            dimensao = 0
+            if self.__isVariableList(identifier):
+                dimensao = 1
+                key = str(identifier.IDENT()[0])
+
             try:
-                self.scope.add(key, type)
+                self.scope.add(key, type, dimensao)
 
             except SymbolAlreadyDefinedException:
                 self.errors.append(
@@ -254,7 +264,6 @@ class Alguma(LAGrammarVisitor):
 
     def __getIdentificadorType(self, ctx: LAGrammarParser.IdentificadorContext):
         identificador = str(ctx.IDENT()[0])
-
         symbol = self.scope.find(identificador)
 
         if symbol:
@@ -290,6 +299,9 @@ class Alguma(LAGrammarVisitor):
     def __checkAttributionType(
         self, identifier, identifier_type, expression_types, line
     ):
+        if identifier_type == None:
+            self.errors.append(f"Linha {line}: identificador {identifier} nao declarado")
+            return
         if not all(is_coercible(identifier_type, type) for type in expression_types):
             self.errors.append(
                 f"Linha {line}: atribuicao nao compativel para {identifier}"
@@ -302,3 +314,8 @@ class Alguma(LAGrammarVisitor):
             self.errors.append(
                 f"Linha {line}: incompatibilidade de parametros na chamada de {function_name}"
             )
+
+    def __isVariableList(self, identificador):
+        if identificador.dimensao().getText().startswith("["):
+            return True
+        return False

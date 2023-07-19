@@ -7,9 +7,10 @@ class SymbolAlreadyDefinedException(Exception):
 
 
 class Symbol:
-    def __init__(self, type, value):
+    def __init__(self, type, value, dimensao):
         self.type = type
         self.value = value
+        self.dimensao = dimensao
 
     def setType(self, type):
         self.type = type
@@ -17,11 +18,14 @@ class Symbol:
     def setValue(self, value):
         self.value = value
 
+    def setDimensao(self, dimensao):
+        self.dimensao = dimensao
+
     def __repr__(self) -> str:
         if self.type == None:
-            return f"Symbol(type={self.type}, register_type={self.type}, value={self.value})"
+            return f"Symbol(type={self.type}, register_type={self.type}, value={self.value}, dimensao={self.dimensao})"
         
-        return f"Symbol(type={self.type.tipoBasico}, register_type={self.type.tipoRegistro}, value={self.value})"
+        return f"Symbol(type={self.type.tipoBasico}, register_type={self.type.tipoRegistro}, value={self.value}, dimensao={self.dimensao})"
 
 
 class Scope:
@@ -40,13 +44,13 @@ class Scope:
     def leaveScope(self):
         self.stack.pop()
 
-    def add(self, key: str, type: TipoVariavel) -> None:
+    def add(self, key: str, type: TipoVariavel, dimensao: int) -> None:
         current_scope = self.stack[-1]
 
         if key in current_scope:
             raise SymbolAlreadyDefinedException
         else:
-            current_scope[key] = Symbol(type, None)
+            current_scope[key] = Symbol(type, None, dimensao)
 
     def set(self, key: str, value) -> None:
         current_scope = self.stack[-1]
