@@ -23,6 +23,11 @@ class Alguma(LAGrammarVisitor):
 
     def visitCorpo(self, ctx: LAGrammarParser.CorpoContext):
         self.scope.newScope()
+        for cmd in ctx.cmd():
+            if cmd.cmdRetorne():
+                self.errors.append(
+                    f"Linha {cmd.start.line}: comando retorne nao permitido nesse escopo"
+                )
         return super().visitCorpo(ctx)
     
     def visitDecl_local_global(self, ctx: LAGrammarParser.Decl_local_globalContext):
@@ -175,7 +180,7 @@ class Alguma(LAGrammarVisitor):
             parametros_types.append(parametro_type)
 
         self.__checkParameterType(
-            decl_global, escopo[decl_global].type.tipoFuncao, flatten_list(parametros_types), ctx, ctx.start.line
+            decl_global, flatten_list(parametros_types), ctx, ctx.start.line
         )
 
         super().visitCmdChamada(ctx)
@@ -271,7 +276,7 @@ class Alguma(LAGrammarVisitor):
             return "real"
 
         if ctx.expressao():
-            return self.__getExpressaoType(ctx.expressao()[0])
+            return self.__getExpressaoType(ctx.expressao()[0] if ctx.expressao() is list else ctx.expressao())
 
     def __getParcela_nao_unarioType(
         self, ctx: LAGrammarParser.Parcela_nao_unarioContext
@@ -328,7 +333,7 @@ class Alguma(LAGrammarVisitor):
             )
 
     def __checkParameterType(
-        self, decl_global, decl_global_type, parameter_types, chamada: LAGrammarParser.CmdChamadaContext, line
+        self, decl_global, parameter_types, chamada: LAGrammarParser.CmdChamadaContext, line
     ):
         decl_global = chamada.IDENT().getText()
         quant_parametros_passados = len(chamada.expressao())
