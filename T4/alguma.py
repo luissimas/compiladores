@@ -157,7 +157,20 @@ class Alguma(LAGrammarVisitor):
         super().visitCmdEscreva(ctx)
     
     def visitCmdChamada(self, ctx: LAGrammarParser.CmdChamadaContext):
-        #print(ctx.getText())
+        decl_global = ctx.IDENT().getText()
+        escopo = self.scope.findGlobalDecl(decl_global)
+
+        parametros_types = []
+        for expressao in ctx.expressao():
+            parametro_type = flatten_list(self.__getExpressaoType(expressao))
+            parametros_types.append(parametro_type)
+
+        self.__checkParameterType(
+            decl_global, escopo[decl_global].type.tipoFuncao, flatten_list(parametros_types), ctx, ctx.start.line
+        )
+
+            #print(decl_global, parametro_type, escopo[decl_global].type.tipoBasico)
+
         super().visitCmdChamada(ctx)
 
     def visitCmdEnquanto(self, ctx: LAGrammarParser.CmdEnquantoContext):
@@ -239,10 +252,10 @@ class Alguma(LAGrammarVisitor):
             self.__checkDeclaredIdentifier(identifier, line)
             return self.__getIdentificadorType(identifier)
         
-        if ctx.IDENT():
-            escopo = self.scope.findGlobalDecl(ctx.IDENT().getText())
-            # funcao ou procedimento
-            return escopo[ctx.IDENT().getText()].type.tipoBasico
+        if ctx.cmdChamada():
+            decl_global = ctx.cmdChamada().IDENT().getText()
+            escopo = self.scope.findGlobalDecl(decl_global)
+            return escopo[decl_global].type.tipoFuncao
 
         if ctx.NUM_INT():
             return "inteiro"
@@ -306,6 +319,28 @@ class Alguma(LAGrammarVisitor):
             self.errors.append(
                 f"Linha {line}: atribuicao nao compativel para {identifier}"
             )
+
+    def __checkParameterType(
+        self, decl_global, decl_global_type, parameter_types, chamada: LAGrammarParser.CmdChamadaContext, line
+    ):
+        decl_global = chamada.IDENT().getText()
+        quant_parametros_passados = len(chamada.expressao())
+        escopo = self.scope.findGlobalDecl(decl_global)
+
+        quant_parametros = len(escopo) - 1
+        if quant_parametros_passados != quant_parametros:
+            self.errors.append(
+                f"Linha {line}: incompatibilidade de parametros na chamada de {decl_global}"
+            )
+            return
+
+        # verifica se os tipos dos parametros sao iguais, ignorando a declaracao da funcao
+        for i in range(1, len(escopo)):
+            p_type = list(escopo.values())[i].type.tipoBasico
+            if p_type != parameter_types[i-1]:
+                self.errors.append(
+                    f"Linha {line}: incompatibilidade de parametros na chamada de {decl_global}"
+                )        
     
     def __checkReturnType(
         self, function_name, function_type, return_types, line

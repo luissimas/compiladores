@@ -75,7 +75,7 @@ op2: '*' | '/';
 op3: '%';
 parcela: op_unario? parcela_unario | parcela_nao_unario;
 parcela_unario: '^'? identificador
-	| IDENT '(' expressao (',' expressao)* ')'
+	| cmdChamada
 	| NUM_INT
 	| NUM_REAL
 	| '(' expressao ')';

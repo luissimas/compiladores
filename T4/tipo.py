@@ -23,18 +23,25 @@ class TipoVariavel:
             type_name = "ponteiro"
 
         # verifica se eh registro
-        if not isinstance(ctx, LAGrammarParser.Declaracao_globalContext) and type_obj.registro():
+        if (isinstance(ctx, LAGrammarParser.VariavelContext) or isinstance(ctx, LAGrammarParser.Declaracao_localContext)) and type_obj.registro():
             self.tipoBasico = "registro"
             self.tipoRegistro = self.__getRegistroType(ctx.tipo().registro())
+            self.tipoFuncao = ""
         # verifica se eh um tipo declarado pelo autor
         elif type_name in extraTypes:
             self.tipoBasico = extraTypes[type_name].tipoBasico
             self.tipoRegistro = extraTypes[type_name].tipoRegistro
+            self.tipoFuncao = ""
+        elif isinstance(ctx, LAGrammarParser.Declaracao_globalContext):
+            self.tipoBasico = type_name
+            self.tipoRegistro = ""
+            self.tipoFuncao = ctx.tipo_estendido().getText()
         # senao eh so tipo basico
         else:
             self.__checkType(type_name, line)
             self.tipoBasico = type_name
             self.tipoRegistro = ""
+            self.tipoFuncao = ""
 
     def __checkType(self, type: str, line) -> bool:
         if type not in self.validTypes:
