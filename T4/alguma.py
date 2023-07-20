@@ -25,8 +25,11 @@ class Alguma(LAGrammarVisitor):
         self.scope.newScope()
         return super().visitCorpo(ctx)
     
-    def visitDeclaracao_global(self, ctx: LAGrammarParser.Declaracao_globalContext):
+    def visitDecl_local_global(self, ctx: LAGrammarParser.Decl_local_globalContext):
         self.scope.newScope()
+        return super().visitDecl_local_global(ctx)
+    
+    def visitDeclaracao_global(self, ctx: LAGrammarParser.Declaracao_globalContext):
         nome_funcao = ctx.IDENT().getText()
 
         line = ctx.start.line
@@ -44,14 +47,16 @@ class Alguma(LAGrammarVisitor):
 
         self.__setParametros(ctx.parametros())
 
-        tipo_funcao = ctx.tipo_estendido().getText()
         tipo_retorno = flatten_list(
-            self.__getCmdType(ctx.cmd())
+            self.__getCmdType(tipo_decl_global, ctx.cmd())
         )
 
-        self.__checkReturnType(
-            nome_funcao, tipo_funcao, tipo_retorno, ctx.start.line
-        )
+        if str(ctx.children[0]) == "funcao":
+            tipo_funcao = ctx.tipo_estendido().getText()
+
+            self.__checkReturnType(
+                nome_funcao, tipo_funcao, tipo_retorno, ctx.start.line
+            )
 
         return super().visitDeclaracao_global(ctx)
     
@@ -82,18 +87,22 @@ class Alguma(LAGrammarVisitor):
                     f"Linha {line}: identificador {key} ja declarado anteriormente"
                 )
 
-    def __getCmdType(self, ctx: LAGrammarParser.CmdContext):
+    def __getCmdType(self, tipo_decl_global: TipoVariavel, ctx: LAGrammarParser.CmdContext):
         types = []
         for cmd in ctx:
             if cmd.cmdSe():
-                types.append(self.__getCmdSeType(cmd.cmdSe()))
+                types.append(self.__getCmdSeType(tipo_decl_global, cmd.cmdSe()))
             if cmd.cmdRetorne():
+                if tipo_decl_global.tipoBasico != "funcao":
+                    self.errors.append(
+                        f"Linha {cmd.start.line}: comando retorne nao permitido nesse escopo"
+                    )
                 types.append(self.__getCmdRetorneType(cmd.cmdRetorne()))
         return types
     
-    def __getCmdSeType(self, ctx: LAGrammarParser.CmdSeContext):
+    def __getCmdSeType(self, tipo_decl_global: TipoVariavel, ctx: LAGrammarParser.CmdSeContext):
         if ctx.cmd():
-            types  = flatten_list(self.__getCmdType(ctx.cmd()))
+            types  = flatten_list(self.__getCmdType(tipo_decl_global, ctx.cmd()))
         return types
 
     def __getCmdRetorneType(self, ctx: LAGrammarParser.CmdRetorneContext):
@@ -168,8 +177,6 @@ class Alguma(LAGrammarVisitor):
         self.__checkParameterType(
             decl_global, escopo[decl_global].type.tipoFuncao, flatten_list(parametros_types), ctx, ctx.start.line
         )
-
-            #print(decl_global, parametro_type, escopo[decl_global].type.tipoBasico)
 
         super().visitCmdChamada(ctx)
 

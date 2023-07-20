@@ -1,59 +1,36 @@
-{ exemplificacao de sub-rotinas na forma de funcao e seu uso }
+{ determinar, dados os comprimentos dos lados de um triângulo, se o triângulo pode ser formado (se existe) e qual o tipo dele (equilátero, isósceles ou escaleno) }
 
-funcao menorInteiro(valor1: inteiro, valor2: inteiro): inteiro
-{ retorna o menor entre valor1 e valor2; se iguais retorna um deles }
-
-      se valor1 < valor2 entao
-           retorne valor1
-      senao
-           retorne valor2
-      fim_se
-fim_funcao
-
-funcao menorReal(valor1: real, valor2: real): real
-{ retorna o menor entre valor1 e valor2; se iguais, retorna um deles }
-
-      se valor1 < valor2 entao
-           retorne valor1
-      senao
-           retorne valor2
-      fim_se
-fim_funcao
-
-funcao modulo(valor: real): real
-{ retorna o valor absoluto do valor }
-
-      se valor < 0 entao
-           valor <- -valor
-      fim_se
-      retorne valor
-fim_funcao
-
-{ parte principal }
 algoritmo
-      declare
-           primeiroInt, segundoInt: inteiro
-		declare
-           primeiroReal, segundoReal: real
+	declare
+		lado1, lado2, lado3: real
+	declare
+		existeTriangulo,
+		ehEquilatero, ehIsosceles, ehEscaleno: logico
 
-      { entrada de dados }
-      leia(primeiroInt, segundoInt, primeiroReal, segundoReal)
+	{ leitura dos comprimentos dos lados }
+	escreva("Lado 1: ")
+	leia(lado1)
+	escreva("Lado 2: ")
+	leia(lado2)
+	escreva("Lado 3: ")
+	leia(lado3)
 
-      { algumas saidas e manipulacoes }
-      escreva("O menor inteiro entre", primeiroInt, "e", 
-                segundoInt, "eh", menorInteiro(primeiroInt))
+	{ verificações necessárias }
+	existeTriangulo <- lado1 < lado2 + lado3 e
+				lado2 < lado1 + lado3 e
+				lado3 < lado1 + lado2
+	
+	ehEquilatero <- existeTriangulo e lado1 = lado2 e lado2 = lado3
 
-      se menorReal(primeiroReal, segundoInt) <> primeiroReal entao
-           escreva(segundoReal, "eh menor que", primeiroReal)
-      fim_se
+	ehIsosceles <- existeTriangulo e nao ehEquilatero e
+			(lado1 = lado2 ou lado2 = lado3 ou lado1 = lado3)
 
-      se modulo(primeiroReal) = primeiroReal e primeiroReal <> 0 entao
-           escreva("O valor", primeiroReal, "eh positivo")
-      senao
-           escreva("O valor", primeiroReal, "nao eh positivo")
-      fim_se
+	ehEscaleno <- existeTriangulo e nao ehEquilatero e nao ehIsosceles
 
-      escreva("Considerando-se o modulo, tem-se que o menor entre",
-                primeiroReal, "e", segundoReal, "eh", 
-                menorReal(modulo(primeiroReal), modulo(segundoReal)))
+	{ resultados }
+	escreva("Triangulo existe? ", existeTriangulo)
+	escreva("Eh equilatero? ", ehEquilatero)
+	escreva("Eh isosceles? ", ehIsosceles)
+	escreva("Eh escaleno? ", ehEscaleno)
+   retorne "FIM"
 fim_algoritmo

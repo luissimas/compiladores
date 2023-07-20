@@ -35,7 +35,10 @@ class TipoVariavel:
         elif isinstance(ctx, LAGrammarParser.Declaracao_globalContext):
             self.tipoBasico = type_name
             self.tipoRegistro = ""
-            self.tipoFuncao = ctx.tipo_estendido().getText()
+            if type_name == "funcao":
+                self.tipoFuncao = ctx.tipo_estendido().getText()
+            else:
+                self.tipoFuncao = ""
         # senao eh so tipo basico
         else:
             self.__checkType(type_name, line)
