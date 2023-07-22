@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 from tipo import TipoVariavel
 
+
 class SymbolAlreadyDefinedException(Exception):
     "Símbolo já definido no escopo"
     pass
 
 
 class Symbol:
-    def __init__(self, type, value, dimensao):
+    def __init__(self, type: TipoVariavel, value, dimensao):
         self.type = type
         self.value = value
         self.dimensao = dimensao
@@ -24,7 +25,7 @@ class Symbol:
     def __repr__(self) -> str:
         if self.type == None:
             return f"Symbol(type={self.type}, register_type={self.type}, value={self.value}, dimensao={self.dimensao})"
-        
+
         return f"Symbol(type={self.type.tipoBasico}, register_type={self.type.tipoRegistro}, value={self.value}, dimensao={self.dimensao})"
 
 
@@ -68,10 +69,13 @@ class Scope:
                 if symbol:
                     return symbol
         return None
-    
+
     def findGlobalDecl(self, key: str) -> Symbol | None:
         for scope in self.stack:
             if key in scope:
-                if scope[key].type.tipoBasico == "funcao" or scope[key].type.tipoBasico == "procedimento":
+                if (
+                    scope[key].type.tipoBasico == "funcao"
+                    or scope[key].type.tipoBasico == "procedimento"
+                ):
                     return scope
         return None

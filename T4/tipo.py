@@ -1,9 +1,23 @@
 from LAGrammarParser import LAGrammarParser
 
-class TipoVariavel:
-    validTypes = ["inteiro", "literal", "real", "logico", "ponteiro", "registro", "funcao", "procedimento"]
 
-    def __init__(self, extraTypes, ctx: LAGrammarParser.VariavelContext|LAGrammarParser.ParametroContext):
+class TipoVariavel:
+    validTypes = [
+        "inteiro",
+        "literal",
+        "real",
+        "logico",
+        "ponteiro",
+        "registro",
+        "funcao",
+        "procedimento",
+    ]
+
+    def __init__(
+        self,
+        extraTypes,
+        ctx: LAGrammarParser.VariavelContext | LAGrammarParser.ParametroContext,
+    ):
         line = ctx.start.line
 
         # declaracao do nome da funcao ou procedimento
@@ -23,7 +37,10 @@ class TipoVariavel:
             type_name = "ponteiro"
 
         # verifica se eh registro
-        if (isinstance(ctx, LAGrammarParser.VariavelContext) or isinstance(ctx, LAGrammarParser.Declaracao_localContext)) and type_obj.registro():
+        if (
+            isinstance(ctx, LAGrammarParser.VariavelContext)
+            or isinstance(ctx, LAGrammarParser.Declaracao_localContext)
+        ) and type_obj.registro():
             self.tipoBasico = "registro"
             self.tipoRegistro = self.__getRegistroType(ctx.tipo().registro())
             self.tipoFuncao = ""
@@ -35,6 +52,11 @@ class TipoVariavel:
         elif isinstance(ctx, LAGrammarParser.Declaracao_globalContext):
             self.tipoBasico = type_name
             self.tipoRegistro = ""
+            self.parameters = []
+            for parametro in ctx.parametros().parametro():
+                for _ in parametro.identificador():
+                    self.parameters.append(parametro.tipo_estendido().getText())
+
             if type_name == "funcao":
                 self.tipoFuncao = ctx.tipo_estendido().getText()
             else:
@@ -56,4 +78,4 @@ class TipoVariavel:
             for i in v.identificador():
                 registro[i.getText()] = v.tipo().getText()
 
-        return registro 
+        return registro

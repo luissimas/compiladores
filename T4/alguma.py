@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
-from tipo import TipoVariavel
 from LAGrammarParser import LAGrammarParser
 from LAGrammarVisitor import LAGrammarVisitor
 from scope import Scope, SymbolAlreadyDefinedException
+from tipo import TipoVariavel
 from utils import flatten_list, is_coercible
 
 
@@ -18,22 +18,21 @@ class Alguma(LAGrammarVisitor):
         self.extraTypes = {}
 
     def visitPrograma(self, ctx: LAGrammarParser.ProgramaContext) -> str:
+        self.scope.newScope()
         super().visitPrograma(ctx)
         return self.__printErrors()
 
     def visitCorpo(self, ctx: LAGrammarParser.CorpoContext):
-        self.scope.newScope()
         for cmd in ctx.cmd():
             if cmd.cmdRetorne():
                 self.errors.append(
                     f"Linha {cmd.start.line}: comando retorne nao permitido nesse escopo"
                 )
         return super().visitCorpo(ctx)
-    
+
     def visitDecl_local_global(self, ctx: LAGrammarParser.Decl_local_globalContext):
-        self.scope.newScope()
         return super().visitDecl_local_global(ctx)
-    
+
     def visitDeclaracao_global(self, ctx: LAGrammarParser.Declaracao_globalContext):
         nome_funcao = ctx.IDENT().getText()
 
@@ -50,11 +49,10 @@ class Alguma(LAGrammarVisitor):
                 f"Linha {line}: identificador {nome_funcao} ja declarado anteriormente"
             )
 
+        self.scope.newScope()
         self.__setParametros(ctx.parametros())
 
-        tipo_retorno = flatten_list(
-            self.__getCmdType(tipo_decl_global, ctx.cmd())
-        )
+        tipo_retorno = flatten_list(self.__getCmdType(tipo_decl_global, ctx.cmd()))
 
         if str(ctx.children[0]) == "funcao":
             tipo_funcao = ctx.tipo_estendido().getText()
@@ -62,9 +60,9 @@ class Alguma(LAGrammarVisitor):
             self.__checkReturnType(
                 nome_funcao, tipo_funcao, tipo_retorno, ctx.start.line
             )
+        self.visitChildren(ctx)
+        self.scope.leaveScope()
 
-        return super().visitDeclaracao_global(ctx)
-    
     def __setParametros(self, ctx: LAGrammarParser.ParametrosContext):
         for p in ctx.parametro():
             self.__setParametro(p)
@@ -92,7 +90,9 @@ class Alguma(LAGrammarVisitor):
                     f"Linha {line}: identificador {key} ja declarado anteriormente"
                 )
 
-    def __getCmdType(self, tipo_decl_global: TipoVariavel, ctx: LAGrammarParser.CmdContext):
+    def __getCmdType(
+        self, tipo_decl_global: TipoVariavel, ctx: LAGrammarParser.CmdContext
+    ):
         types = []
         for cmd in ctx:
             if cmd.cmdSe():
@@ -104,27 +104,43 @@ class Alguma(LAGrammarVisitor):
                     )
                 types.append(self.__getCmdRetorneType(cmd.cmdRetorne()))
         return types
-    
-    def __getCmdSeType(self, tipo_decl_global: TipoVariavel, ctx: LAGrammarParser.CmdSeContext):
+
+    def __getCmdSeType(
+        self, tipo_decl_global: TipoVariavel, ctx: LAGrammarParser.CmdSeContext
+    ):
         if ctx.cmd():
-            types  = flatten_list(self.__getCmdType(tipo_decl_global, ctx.cmd()))
+            types = flatten_list(self.__getCmdType(tipo_decl_global, ctx.cmd()))
         return types
 
     def __getCmdRetorneType(self, ctx: LAGrammarParser.CmdRetorneContext):
         # Tipo da expressão
-        tipo_retorno = flatten_list(self.__getExpressaoType(ctx.expressao()))  
+        tipo_retorno = flatten_list(self.__getExpressaoType(ctx.expressao()))
         return tipo_retorno
-    
+
     def visitDeclaracao_local(self, ctx: LAGrammarParser.Declaracao_localContext):
-        if str(ctx.children[0]) == "tipo":
+        type_declaracao = str(ctx.children[0])
+        line = ctx.start.line
+
+        if type_declaracao == "tipo":
             nome_tipo = ctx.IDENT().getText()
             type = TipoVariavel(self.extraTypes, ctx)
             self.extraTypes[nome_tipo] = type
 
-            line = ctx.start.line          
             try:
                 # adiciona tipo ao escopo tambem
                 self.scope.add(nome_tipo, type, 0)
+
+            except SymbolAlreadyDefinedException:
+                self.errors.append(
+                    f"Linha {line}: identificador {nome_tipo} ja declarado anteriormente"
+                )
+        if type_declaracao == "constante":
+            nome_constante = ctx.IDENT().getText()
+            tipo = ctx.tipo_basico().getText()
+
+            try:
+                # adiciona tipo ao escopo tambem
+                self.scope.add(nome_constante, tipo, 0)
 
             except SymbolAlreadyDefinedException:
                 self.errors.append(
@@ -161,7 +177,7 @@ class Alguma(LAGrammarVisitor):
         for identifier in ctx.identificador():
             line = identifier.start.line
             self.__checkDeclaredIdentifier(identifier, line)
-        
+
         super().visitCmdLeia(ctx)
 
     def visitCmdEscreva(self, ctx: LAGrammarParser.CmdEscrevaContext):
@@ -169,10 +185,10 @@ class Alguma(LAGrammarVisitor):
             self.__getExpressaoType(expressao)
 
         super().visitCmdEscreva(ctx)
-    
+
     def visitCmdChamada(self, ctx: LAGrammarParser.CmdChamadaContext):
         decl_global = ctx.IDENT().getText()
-        escopo = self.scope.findGlobalDecl(decl_global)
+        self.scope.find(decl_global)
 
         parametros_types = []
         for expressao in ctx.expressao():
@@ -194,7 +210,7 @@ class Alguma(LAGrammarVisitor):
 
         # verifica se é ponteiro
         if str(ctx.children[0]) == "^":
-            identificador = "^"+identificador
+            identificador = "^" + identificador
 
         tipo_identificador = self.__getIdentificadorType(
             ctx.identificador()
@@ -263,7 +279,7 @@ class Alguma(LAGrammarVisitor):
             line = identifier.start.line
             self.__checkDeclaredIdentifier(identifier, line)
             return self.__getIdentificadorType(identifier)
-        
+
         if ctx.cmdChamada():
             decl_global = ctx.cmdChamada().IDENT().getText()
             escopo = self.scope.findGlobalDecl(decl_global)
@@ -276,14 +292,16 @@ class Alguma(LAGrammarVisitor):
             return "real"
 
         if ctx.expressao():
-            return self.__getExpressaoType(ctx.expressao()[0] if ctx.expressao() is list else ctx.expressao())
+            return self.__getExpressaoType(
+                ctx.expressao()[0] if ctx.expressao() is list else ctx.expressao()
+            )
 
     def __getParcela_nao_unarioType(
         self, ctx: LAGrammarParser.Parcela_nao_unarioContext
     ):
         if ctx.CADEIA():
             return "literal"
-        
+
         if ctx.identificador():
             return "endereco"
 
@@ -298,34 +316,41 @@ class Alguma(LAGrammarVisitor):
                 segundo_ident = ctx.IDENT()[1].getText()
                 # retorna o tipo desse atributo
                 return symbol.type.tipoRegistro[segundo_ident] if symbol.type else ""
-            
+
             return symbol.type.tipoBasico if symbol.type else ""
 
     def __printErrors(self) -> str:
         return "\n".join(self.errors)
 
-    def __checkDeclaredIdentifier(self, identifier: LAGrammarParser.IdentificadorContext, line):
+    def __checkDeclaredIdentifier(
+        self, identifier: LAGrammarParser.IdentificadorContext, line
+    ):
         text = identifier.IDENT()[0].getText()
         symbol = self.scope.find(text)
 
         if not symbol:
-            self.errors.append(f"Linha {line}: identificador {identifier.getText()} nao declarado")
+            self.errors.append(
+                f"Linha {line}: identificador {identifier.getText()} nao declarado"
+            )
             return
-                
+
         if len(identifier.IDENT()) > 1:
             # pega o proximo atributo de identificador
             segundo_ident = identifier.IDENT()[1].getText()
             # retorna o tipo desse atributo
             if symbol.type:
                 if segundo_ident not in symbol.type.tipoRegistro:
-                    self.errors.append(f"Linha {line}: identificador {identifier.getText()} nao declarado")
-
+                    self.errors.append(
+                        f"Linha {line}: identificador {identifier.getText()} nao declarado"
+                    )
 
     def __checkAttributionType(
         self, identifier, identifier_type, expression_types, line
     ):
         if identifier_type == None:
-            self.errors.append(f"Linha {line}: identificador {identifier} nao declarado")
+            self.errors.append(
+                f"Linha {line}: identificador {identifier} nao declarado"
+            )
             return
         if not all(is_coercible(identifier_type, type) for type in expression_types):
             self.errors.append(
@@ -333,30 +358,40 @@ class Alguma(LAGrammarVisitor):
             )
 
     def __checkParameterType(
-        self, decl_global, parameter_types, chamada: LAGrammarParser.CmdChamadaContext, line
+        self,
+        decl_global,
+        parameter_types,
+        chamada: LAGrammarParser.CmdChamadaContext,
+        line,
     ):
         decl_global = chamada.IDENT().getText()
         quant_parametros_passados = len(chamada.expressao())
         escopo = self.scope.findGlobalDecl(decl_global)
+        symbol = self.scope.find(decl_global)
 
-        quant_parametros = len(escopo) - 1
-        if quant_parametros_passados != quant_parametros:
+        parameters = symbol.type.parameters
+
+        if quant_parametros_passados != len(parameters):
+            # print("OPA")
             self.errors.append(
                 f"Linha {line}: incompatibilidade de parametros na chamada de {decl_global}"
             )
             return
 
         # verifica se os tipos dos parametros sao iguais, ignorando a declaracao da funcao
-        for i in range(1, len(escopo)):
-            p_type = list(escopo.values())[i].type.tipoBasico
-            if p_type != parameter_types[i-1]:
+        for i in range(0, len(parameters)):
+            parameter_type = parameters[i]
+            type = (
+                self.extraTypes[parameter_type].tipoBasico
+                if parameter_type in self.extraTypes
+                else parameter_type
+            )
+            if type != parameter_types[i]:
                 self.errors.append(
                     f"Linha {line}: incompatibilidade de parametros na chamada de {decl_global}"
-                )        
-    
-    def __checkReturnType(
-        self, function_name, function_type, return_types, line
-    ):
+                )
+
+    def __checkReturnType(self, function_name, function_type, return_types, line):
         if not all(is_coercible(function_type, type) for type in return_types):
             self.errors.append(
                 f"Linha {line}: incompatibilidade de parametros na chamada de {function_name}"

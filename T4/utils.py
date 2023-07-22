@@ -26,7 +26,10 @@ def is_coercible(type_a, type_b):
     """
     if type_a == "real" and type_b == "inteiro":
         return True
-    
+
+    if type_a == "inteiro" and type_b == "real":
+        return True
+
     if type_a == "ponteiro" and type_b == "endereco":
         return True
 
