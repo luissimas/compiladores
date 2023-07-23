@@ -1,5 +1,5 @@
-# Trabalho 3
-O Trabalho 3 da disciplina consiste em implementar um analisador semântico para a linguagem LA (Linguagem Algorítmica) desenvolvida pelo prof. Jander, no âmbito do DC/UFSCar.
+# Trabalho 4
+O Trabalho 4 da disciplina consiste em implementar um analisador semântico para a linguagem LA (Linguagem Algorítmica) desenvolvida pelo prof. Jander, no âmbito do DC/UFSCar.
 
 Tendo isso em vista, este projeto consiste em um parser e lexer desenvolvido com ANTLR para analisar um arquivo de entrada seguindo a gramática definida no arquivo `LAGrammar.g4`.
 
@@ -16,10 +16,10 @@ Antes de executar o projeto, certifique-se de ter os seguintes requisitos atendi
 git clone https://github.com/luissimas/compiladores.git
 ```
 
-2. Navegue até o diretório T3:
+2. Navegue até o diretório T4:
 
 ``` shell
-cd T3
+cd T4
 ```
 
 3. Instale as dependências do projeto:
@@ -29,7 +29,7 @@ pip install -r requirements.txt
 ```
 
 ## Uso
-O projeto conta com um Makefile para conveniência de uso, sendo assim as instruções aqui contidas levarão esse fato em consideração. Note que todas as instruções a seguir assumem que os comando serão executadas no diretório `T3`.
+O projeto conta com um Makefile para conveniência de uso, sendo assim as instruções aqui contidas levarão esse fato em consideração. Note que todas as instruções a seguir assumem que os comando serão executadas no diretório `T4`.
 
 ### Gerando o parser
 Para gerar o parser a partir do arquivo de gramática LAGrammar.g4, basta executar o seguinte comando:
