@@ -241,6 +241,20 @@ class Alguma(LAGrammarVisitor):
         self.__getExpressaoType(ctx.expressao())
         super().visitCmdEnquanto(ctx)
 
+    def visitCmdSe(self, ctx: LAGrammarParser.CmdSeContext):
+        self.c_code += f"if ({ctx.expressao().getText()})" + "{\n"
+
+        # TODO: visit only cmds inside if block
+        for cmd in ctx.cmd():
+            print(cmd)
+            super().visitCmd(cmd)
+
+        # TODO: visit only cmds inside else block
+        if "senao" in ctx.getText():
+            self.c_code += "} else {\n"
+
+        self.c_code += "}\n"
+
     def visitCmdAtribuicao(self, ctx: LAGrammarParser.CmdAtribuicaoContext):
         identificador = ctx.identificador().getText()
 

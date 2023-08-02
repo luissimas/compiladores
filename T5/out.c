@@ -1,9 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 int main() {
-float x,y;
-scanf("%f", &x);
-y = x+5.0;
-printf("%f",y);
+if (4=3){
+printf("%s","4 eh igual a 3");
+printf("%s","4 eh diferente de 3");
+} else {
+}
 return 0;
 }
