@@ -1,6 +1,6 @@
 algoritmo
-  declare i: inteiro
-  para i <- 1 ate 5 faca
-    escreva(i,"\n")
-  fim_para
+  se 4 = 3 
+    entao escreva("4 eh igual a 3")
+    senao escreva("4 eh diferente de 3")
+  fim_se
 fim_algoritmo

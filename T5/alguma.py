@@ -243,8 +243,15 @@ class Alguma(LAGrammarVisitor):
         super().visitCmdChamada(ctx)
 
     def visitCmdEnquanto(self, ctx: LAGrammarParser.CmdEnquantoContext):
-        self.__getExpressaoType(ctx.expressao())
-        super().visitCmdEnquanto(ctx)
+        expressao = self.__exprFor(ctx.expressao())
+
+        self.c_code += f"while ({expressao})" + "{\n"
+        cmds = ctx.cmd()
+        
+        for i in range(0, len(cmds)):
+            super().visitCmd(ctx.cmd(i))
+
+        self.c_code += "}\n"
         
     def visitCmdPara(self, ctx: LAGrammarParser.CmdParaContext):
         i = ctx.exp_aritmetica(0).getText()
@@ -255,9 +262,7 @@ class Alguma(LAGrammarVisitor):
         super().visitCmd(ctx.cmd(0))
 
         self.c_code += "}\n"
-                
-        #super().visitCmdEnquanto(ctx)
-
+                       
     def visitCmdSe(self, ctx: LAGrammarParser.CmdSeContext):
         self.c_code += f"if ({self.__exprToCCode(ctx.expressao())})" + "{\n"
 
@@ -270,7 +275,9 @@ class Alguma(LAGrammarVisitor):
         self.c_code += "}\n"
 
     def __exprToCCode(self, ctx: LAGrammarParser.ExpressaoContext):
+        expr = ctx.getText()
         return ctx.getText().replace("=", "==")
+
     
     def __exprFor(self, ctx: LAGrammarParser.ExpressaoContext):
         return ctx.getText()
