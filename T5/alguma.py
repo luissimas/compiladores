@@ -175,7 +175,10 @@ class Alguma(LAGrammarVisitor):
             key = identifier.getText()
             line = identifier.start.line
 
-            self.c_code += f"{key},"
+            if type.tipoBasico == "literal":
+                self.c_code += f"{key}[80],"
+            else:
+                self.c_code += f"{key},"
 
             dimensao = 0
             if self.__isVariableList(identifier):
@@ -204,7 +207,9 @@ class Alguma(LAGrammarVisitor):
             symbol = self.scope.find(identifier_text)
 
             format_string += f"%{symbol.type.getCFormatString()}"
-            identifiers += f"&{identifier_text}"
+            if symbol.type.tipoBasico != "literal":
+                identifiers += f"&"
+            identifiers += f"{identifier_text}"
 
         self.c_code += f'scanf("{format_string}", {identifiers});\n'
 
