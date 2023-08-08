@@ -1,7 +1,7 @@
-# Trabalho 4
-O Trabalho 4 da disciplina consiste em implementar um analisador semântico para a linguagem LA (Linguagem Algorítmica) desenvolvida pelo prof. Jander, no âmbito do DC/UFSCar.
+# Trabalho 5
+O Trabalho 5 da disciplina consiste em implementar um gerador de código C para a linguagem LA (Linguagem Algorítmica) desenvolvida pelo prof. Jander, no âmbito do DC/UFSCar.
 
-Tendo isso em vista, este projeto consiste em um parser e lexer desenvolvido com ANTLR para analisar um arquivo de entrada seguindo a gramática definida no arquivo `LAGrammar.g4`.
+Tendo isso em vista, este projeto consiste em um parser e lexer desenvolvido com ANTLR para analisar um arquivo de entrada seguindo a gramática definida no arquivo `LAGrammar.g4` e gerar o código C equivalente.
 
 ## Pré-requisitos
 Antes de executar o projeto, certifique-se de ter os seguintes requisitos atendidos:
@@ -16,10 +16,10 @@ Antes de executar o projeto, certifique-se de ter os seguintes requisitos atendi
 git clone https://github.com/luissimas/compiladores.git
 ```
 
-2. Navegue até o diretório T4:
+2. Navegue até o diretório T5:
 
 ``` shell
-cd T4
+cd T5
 ```
 
 3. Instale as dependências do projeto:
@@ -29,7 +29,7 @@ pip install -r requirements.txt
 ```
 
 ## Uso
-O projeto conta com um Makefile para conveniência de uso, sendo assim as instruções aqui contidas levarão esse fato em consideração. Note que todas as instruções a seguir assumem que os comando serão executadas no diretório `T4`.
+O projeto conta com um Makefile para conveniência de uso, sendo assim as instruções aqui contidas levarão esse fato em consideração. Note que todas as instruções a seguir assumem que os comando serão executadas no diretório `T5`.
 
 ### Gerando o parser
 Para gerar o parser a partir do arquivo de gramática LAGrammar.g4, basta executar o seguinte comando:
@@ -47,22 +47,17 @@ antlr4 -Dlanguage=Python3 LAGrammar.g4
 ```
 
 ### Executando o parser
-Para executar o parser e fazer a análise semântica de um arquivo de entrada, siga as etapas abaixo:
+Para executar o parser e fazer a análise semântica e geração de código de um arquivo de entrada, siga as etapas abaixo:
 
-1. Certifique-se de ter um arquivo de entrada no formato desejado. Por exemplo,`in.txt`.
-2. Execute o seguinte comando:
-
-``` shell
-make run INPUT_FILE=in.txt
-```
-
-Este comando irá gerar o lexer com base no arquivo da gramática, analisar o arquivo de entrada e gerar um arquivo de saída chamado `out.txt` com os erros léxicos e semânticos encontrados.
-
-Caso opte por não utilizar as rotinas do Makefile, é possível obter o mesmo resultado com o seguinte commando:
+1. Certifique-se de ter um arquivo de entrada no formato desejado com um programa na linguagem Alguma. Por exemplo,`in.txt`
+2. Certifique-se de ter um arquivo com a entrada do programa compilado. Por exemplo, `in`
+3. Execute o seguinte comando:
 
 ``` shell
-python main.py in.txt out.txt
+make run INPUT_FILE=in.txt EXEC_INPUT=in
 ```
+
+Este comando irá gerar o lexer com base no arquivo da gramática, analisar o arquivo de entrada e gerar um arquivo de saída chamado `out.c` com o o código C gerado e um arquivo binário `out` com o código compilado usando o compilador `gcc`. Além disso, o binário gerado será executado e os conteúdos do arquivo `in` serão direcionados ao programa via STDIN.
 
 Note que ao executar o parser através do comando `make` o parser será gerado automaticamente caso alguma alteração seja feita no arquivo da gramática. Dessa forma, caso opte por não utilizar as rotinas do Makefile, será necessário [gerar manualmente](#gerando-o-parser) o parser.
 
