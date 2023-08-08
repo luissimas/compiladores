@@ -139,6 +139,10 @@ class Alguma(LAGrammarVisitor):
             type = TipoVariavel(self.extraTypes, ctx)
             self.extraTypes[nome_tipo] = type
 
+            self.c_code += f"typedef struct{{\n"
+            super().visitVariavel(ctx.tipo())
+            self.c_code += f"}}{nome_tipo};\n"
+
             try:
                 # adiciona tipo ao escopo tambem
                 self.scope.add(nome_tipo, type, 0)
@@ -171,7 +175,11 @@ class Alguma(LAGrammarVisitor):
         except TypeError as error:
             self.errors.append(str(error))
 
-        self.c_code += f"{type.convertToC()} "
+    
+        if ctx.tipo().getText() in self.extraTypes:
+            self.c_code += f"{ctx.tipo().getText()} {ctx.identificador()[0].getText()},"
+        else:
+            self.c_code += f"{type.convertToC()} "
 
         for identifier in ctx.identificador():
             key = identifier.getText()
@@ -182,10 +190,11 @@ class Alguma(LAGrammarVisitor):
             elif type.tipoBasico == "ponteiro":
                 self.c_code += f"{key},"
             elif type.tipoBasico == "registro":
-                self.c_code += f"{{\n"
-                super().visitVariavel(ctx)
-                self.c_code += f"}}{key};\n"
-
+                # verifica se nao eh declaracao de tipo
+                if ctx.tipo().getText() not in self.extraTypes:
+                    self.c_code += f"{{\n"
+                    super().visitVariavel(ctx)
+                    self.c_code += f"}}{key};\n"
             else:
                 self.c_code += f"{key},"
 

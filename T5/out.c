@@ -1,12 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 int main() {
-int x;
-int* endx;
-x = 0;
-printf("%d%s",x," e ");
-endx = &x;
-*endx = 1;
-printf("%d",x);
+typedef struct{
+char nome[80];
+int idade;
+}treg;
+char nome[80];
+int idade;
+treg reg;
+strcpy(reg.nome, "Maria");
+reg.idade = 30;
+printf("%s%s%d%s",reg.nome," tem ",reg.idade," anos");
 return 0;
 }

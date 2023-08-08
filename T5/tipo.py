@@ -95,6 +95,7 @@ class TipoVariavel:
             "logico": "int",
             "ponteiro": "*",
             "registro": "struct",
+            "tipo": "typedef struct",
         }
 
         type = self.tipoBasico
@@ -103,7 +104,6 @@ class TipoVariavel:
             if type == "ponteiro":
                 return type_assoc[self.tipoPonteiro]+type_assoc[type]
             return type_assoc[type]
-
         return type
 
     def getCFormatString(self):

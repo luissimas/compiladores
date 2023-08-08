@@ -1,9 +1,10 @@
 algoritmo
-  declare x: inteiro
-  declare endx: ^inteiro
-  x <- 0
-  escreva(x," e ")
-  endx <- &x
-  ^endx <- 1
-  escreva(x)
+  tipo treg: registro
+            nome: literal
+            idade: inteiro
+          fim_registro
+  declare reg: treg
+  reg.nome <- "Maria"
+  reg.idade <- 30
+  escreva(reg.nome," tem ",reg.idade," anos")
 fim_algoritmo
