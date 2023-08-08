@@ -151,6 +151,8 @@ class Alguma(LAGrammarVisitor):
             nome_constante = ctx.IDENT().getText()
             tipo = ctx.tipo_basico().getText()
 
+            self.c_code += f"#define {nome_constante} {ctx.valor_constante().getText()}\n"
+
             try:
                 # adiciona tipo ao escopo tambem
                 self.scope.add(nome_constante, tipo, 0)
@@ -179,6 +181,11 @@ class Alguma(LAGrammarVisitor):
                 self.c_code += f"{key}[80],"
             elif type.tipoBasico == "ponteiro":
                 self.c_code += f"{key},"
+            elif type.tipoBasico == "registro":
+                self.c_code += f"{{\n"
+                super().visitVariavel(ctx)
+                self.c_code += f"}}{key};\n"
+
             else:
                 self.c_code += f"{key},"
 
@@ -341,7 +348,10 @@ class Alguma(LAGrammarVisitor):
 
         if str(ctx.children[0]) == "^":
             identificador_c = "*" + ctx.identificador().getText()
-        self.c_code += f"{identificador_c} = {ctx.expressao().getText()};\n"
+        elif tipo_identificador == "literal":
+            self.c_code += f'strcpy({identificador_c}, {ctx.expressao().getText()});\n'
+        else:
+            self.c_code += f"{identificador_c} = {ctx.expressao().getText()};\n"
         
         return super().visitCmdAtribuicao(ctx)
 

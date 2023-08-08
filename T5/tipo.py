@@ -94,6 +94,7 @@ class TipoVariavel:
             "real": "float",
             "logico": "int",
             "ponteiro": "*",
+            "registro": "struct",
         }
 
         type = self.tipoBasico

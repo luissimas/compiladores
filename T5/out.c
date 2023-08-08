@@ -1,12 +1,23 @@
 #include <stdio.h>
 #include <stdlib.h>
+#define teste 8
 int main() {
-int x;
-int* endx;
-x = 0;
-printf("%d%s",x," e ");
-endx = &x;
-*endx = 1;
-printf("%d",x);
+switch(teste){
+case 0:
+case 1:
+case 2:
+case 3:
+case 4:
+case 5:
+case 6:
+case 7:
+printf("%s","ERRO");
+break;
+case 8:
+printf("%s","OK");
+break;
+default:
+printf("%s","ERRO");
+}
 return 0;
 }
