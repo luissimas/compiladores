@@ -73,8 +73,51 @@ class Alguma(LAGrammarVisitor):
             self.__checkReturnType(
                 nome_funcao, tipo_funcao, tipo_retorno, ctx.start.line
             )
-        self.visitChildren(ctx)
+
+            try:
+                type = TipoVariavel(self.extraTypes, ctx)
+            except TypeError as error:
+                self.errors.append(str(error))
+
+            self.c_code += f'{type.convertToC()} {nome_funcao} ('
+            super().visitParametros(ctx.parametros())
+            self.c_code += f'){{\n'
+            for cmd in ctx.cmd():
+                super().visitCmd(cmd)
+            self.c_code += f'}}\n'
+
+        else:
+            self.c_code += f'void {nome_funcao} ('
+            super().visitParametros(ctx.parametros())
+            self.c_code += f'){{\n'
+            for cmd in ctx.cmd():
+                super().visitCmd(cmd)
+            self.c_code += f'}}\n'
+
+        #self.visitChildren(ctx)
         self.scope.leaveScope()
+    
+    def visitParametro(self, ctx: LAGrammarParser.ParametroContext):
+        type = None
+        try:
+            type = TipoVariavel(self.extraTypes, ctx)
+        except TypeError as error:
+            self.errors.append(str(error))
+        
+        self.c_code += f"{type.convertToC()}"
+        for identifier in ctx.identificador():
+            key = identifier.getText()
+
+            if type.tipoBasico == "literal":
+                self.c_code += f"* {key},"
+            else:
+                self.c_code += f" {key},"
+
+        # Trocando a última vírgula pelo final de linha
+        self.c_code = re.sub(r",$", "", self.c_code)
+    
+    def visitCmdRetorne(self, ctx: LAGrammarParser.CmdRetorneContext):
+        self.c_code += f'return {ctx.expressao().getText()};\n'
 
     def __setParametros(self, ctx: LAGrammarParser.ParametrosContext):
         for p in ctx.parametro():
@@ -243,20 +286,23 @@ class Alguma(LAGrammarVisitor):
             expression_string += f",{expressao.getText()}"
 
         self.c_code += f'printf("{format_string}"{expression_string});\n'
-        super().visitCmdEscreva(ctx)
 
     def visitCmdChamada(self, ctx: LAGrammarParser.CmdChamadaContext):
         decl_global = ctx.IDENT().getText()
         self.scope.find(decl_global)
 
+        parametro_text = f''
         parametros_types = []
         for expressao in ctx.expressao():
+            parametro_text += expressao.getText()
             parametro_type = flatten_list(self.__getExpressaoType(expressao))
             parametros_types.append(parametro_type)
 
         self.__checkParameterType(
             decl_global, flatten_list(parametros_types), ctx, ctx.start.line
         )
+
+        self.c_code += f'{decl_global}({parametro_text});\n'
 
         super().visitCmdChamada(ctx)
 

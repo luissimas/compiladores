@@ -104,6 +104,8 @@ class TipoVariavel:
             if type == "ponteiro":
                 return type_assoc[self.tipoPonteiro]+type_assoc[type]
             return type_assoc[type]
+        elif type == "funcao":
+            return type_assoc[self.tipoFuncao]
         return type
 
     def getCFormatString(self):
