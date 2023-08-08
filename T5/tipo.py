@@ -58,14 +58,17 @@ class TipoVariavel:
             self.tipoBasico = "registro"
             self.tipoRegistro = self.__getRegistroType(ctx.tipo().registro())
             self.tipoFuncao = ""
+            self.tipoPonteiro = ""
         # verifica se eh um tipo declarado pelo autor
         elif type_name in extraTypes:
             self.tipoBasico = extraTypes[type_name].tipoBasico
             self.tipoRegistro = extraTypes[type_name].tipoRegistro
             self.tipoFuncao = ""
+            self.tipoPonteiro = ""
         elif isinstance(ctx, LAGrammarParser.Declaracao_globalContext):
             self.tipoBasico = type_name
             self.tipoRegistro = ""
+            self.tipoPonteiro = ""
             self.parameters = []
             for parametro in ctx.parametros().parametro():
                 for _ in parametro.identificador():
@@ -81,6 +84,8 @@ class TipoVariavel:
             self.tipoBasico = type_name
             self.tipoRegistro = ""
             self.tipoFuncao = ""
+            if type_name == "ponteiro":
+                self.tipoPonteiro = type_obj.getText().replace("^", "")
 
     def convertToC(self):
         type_assoc = {
@@ -88,11 +93,14 @@ class TipoVariavel:
             "literal": "char",
             "real": "float",
             "logico": "int",
+            "ponteiro": "*",
         }
 
         type = self.tipoBasico
 
         if type in type_assoc:
+            if type == "ponteiro":
+                return type_assoc[self.tipoPonteiro]+type_assoc[type]
             return type_assoc[type]
 
         return type

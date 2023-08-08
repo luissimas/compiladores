@@ -177,6 +177,8 @@ class Alguma(LAGrammarVisitor):
 
             if type.tipoBasico == "literal":
                 self.c_code += f"{key}[80],"
+            elif type.tipoBasico == "ponteiro":
+                self.c_code += f"{key},"
             else:
                 self.c_code += f"{key},"
 
@@ -320,7 +322,7 @@ class Alguma(LAGrammarVisitor):
         return ctx.getText()
 
     def visitCmdAtribuicao(self, ctx: LAGrammarParser.CmdAtribuicaoContext):
-        identificador = ctx.identificador().getText()
+        identificador = identificador_c = ctx.identificador().getText()
 
         # verifica se é ponteiro
         if str(ctx.children[0]) == "^":
@@ -336,8 +338,11 @@ class Alguma(LAGrammarVisitor):
         self.__checkAttributionType(
             identificador, tipo_identificador, tipo_expressao, ctx.start.line
         )
-        self.c_code += f"{identificador} = {ctx.expressao().getText()};\n"
 
+        if str(ctx.children[0]) == "^":
+            identificador_c = "*" + ctx.identificador().getText()
+        self.c_code += f"{identificador_c} = {ctx.expressao().getText()};\n"
+        
         return super().visitCmdAtribuicao(ctx)
 
     def __getExpressaoType(self, ctx: LAGrammarParser.ExpressaoContext):
