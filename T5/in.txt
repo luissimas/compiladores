@@ -1,9 +1,9 @@
-constante teste: inteiro = 8
 algoritmo
-  caso teste seja
-  0..7: escreva("ERRO")
-  8: escreva("OK")
-  senao
-    escreva("ERRO")
-  fim_caso
+  declare x: inteiro
+  declare endx: ^inteiro
+  x <- 0
+  escreva(x," e ")
+  endx <- &x
+  ^endx <- 1
+  escreva(x)
 fim_algoritmo

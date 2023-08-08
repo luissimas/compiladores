@@ -348,6 +348,7 @@ class Alguma(LAGrammarVisitor):
 
         if str(ctx.children[0]) == "^":
             identificador_c = "*" + ctx.identificador().getText()
+            self.c_code += f"{identificador_c} = {ctx.expressao().getText()};\n"
         elif tipo_identificador == "literal":
             self.c_code += f'strcpy({identificador_c}, {ctx.expressao().getText()});\n'
         else:
