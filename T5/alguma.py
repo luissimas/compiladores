@@ -242,6 +242,29 @@ class Alguma(LAGrammarVisitor):
 
         super().visitCmdChamada(ctx)
 
+    def visitCmdCaso(self, ctx: LAGrammarParser.CmdCasoContext):
+        self.c_code += f'switch({ctx.exp_aritmetica().getText()}){{\n'
+
+        super().visitSelecao(ctx.selecao())
+
+        if ctx.cmd():
+            self.c_code += f'default:\n'
+            super().visitCmd(ctx.cmd()[0])
+        self.c_code += f'}}\n'
+    
+    def visitItem_selecao(self, ctx: LAGrammarParser.Item_selecaoContext):
+        ini_intervalo = int(ctx.constantes().numero_intervalo()[0].NUM_INT()[0].getText())
+        if len(ctx.constantes().numero_intervalo()[0].NUM_INT()) > 1:
+            fim_intervalo = int(ctx.constantes().numero_intervalo()[0].NUM_INT()[1].getText())
+            for i in range(ini_intervalo, fim_intervalo+1):
+                self.c_code += f'case {i}:\n'
+        else:
+            self.c_code += f'case {ini_intervalo}:\n'
+            
+
+        super().visitItem_selecao(ctx)
+        self.c_code += f'break;\n'
+
     def visitCmdEnquanto(self, ctx: LAGrammarParser.CmdEnquantoContext):
         expressao = self.__exprFor(ctx.expressao())
 
