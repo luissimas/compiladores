@@ -242,6 +242,15 @@ class Alguma(LAGrammarVisitor):
 
         super().visitCmdChamada(ctx)
 
+    def visitCmdFaca(self, ctx: LAGrammarParser.CmdFacaContext):
+        self.c_code += f'do{{\n'
+
+        for cmd in ctx.cmd():
+            super().visitCmd(cmd)
+
+        self.c_code += f'}} while ({self.__exprToCCode(ctx.expressao())});\n'
+
+
     def visitCmdCaso(self, ctx: LAGrammarParser.CmdCasoContext):
         self.c_code += f'switch({ctx.exp_aritmetica().getText()}){{\n'
 
@@ -299,7 +308,12 @@ class Alguma(LAGrammarVisitor):
 
     def __exprToCCode(self, ctx: LAGrammarParser.ExpressaoContext):
         expr = ctx.getText()
-        return ctx.getText().replace("=", "==")
+        expr = expr.replace("=", "==")
+        expr = expr.replace('nao', '!')
+        expr = expr.replace('ou', '||')
+        expr = expr.replace('e', '&&')
+
+        return expr
 
     
     def __exprFor(self, ctx: LAGrammarParser.ExpressaoContext):

@@ -1,4 +1,4 @@
-// Generated from /home/vira-tempo/Desktop/UFSCar/Compiladores/compiladores/T4/LAGrammar.g4 by ANTLR 4.9.2
+// Generated from /home/vira-tempo/Desktop/UFSCar/Compiladores/compiladores/T5/LAGrammar.g4 by ANTLR 4.9.2
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.*;
