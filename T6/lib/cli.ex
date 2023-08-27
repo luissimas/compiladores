@@ -1,7 +1,18 @@
 defmodule AnalyticTableaux.CLI do
-  def main(args \\ []) do
-    [content | _] = args
+  def main([]) do
+    IO.read(:stdio, :line) |> run()
+  end
 
+  def main(args) do
+    [filename | _] = args
+
+    case File.read(filename) do
+      {:ok, content} -> run(content)
+      {:error, reason} -> IO.puts(:file.format_error(reason))
+    end
+  end
+
+  def run(content) do
     case Tableaux.prove(content) do
       {:error, reason} ->
         IO.puts(reason)
