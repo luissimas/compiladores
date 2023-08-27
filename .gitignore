@@ -24,3 +24,7 @@ T1/out.txt
 */LAGrammarListener.py
 */LAGrammarParser.py
 */LAGrammarVisitor.py
+
+_build
+deps
+erl_crash.dump
