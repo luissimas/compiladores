@@ -3,9 +3,14 @@ defmodule AnalyticTableaux.CLI do
     [content | _] = args
 
     case Tableaux.prove(content) do
-      {:valid, []} -> IO.puts("Argumento válido!")
+      {:error, reason} ->
+        IO.puts(reason)
+
+      {:valid, []} ->
+        IO.puts("valid argument")
+
       {:invalid, counterexample} ->
-        IO.puts("Argumento inválido, contraexemplo:")
+        IO.puts("invalid argument, counterexample:")
         IO.inspect(counterexample)
     end
   end
