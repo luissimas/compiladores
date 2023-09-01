@@ -1,0 +1,36 @@
+#+title:Analytic Tableaux
+
+* Lógica proposicional
+** Definições básicas
+Átomos representam proposições lógicas e podem ser verdadeiras ou falsas.
+
+Existem quatro operações básicas:
+
+1. Negação: =!p=
+2. Conjunção: =p & q=
+3. Disjunção: =p | q=
+4. Implicação: =p -> q=
+
+Uma fórmula é definida como: um átomo ou um conjunto de fórmulas relacionadas por um operador.
+** Argumento
+Um argumento lógico é um conjunto de proposições que derivam uma conclusão lógica.
+
+#+begin_example
+p->q, p |- q
+#+end_example
+
+Dado um argumento lógico, o processo de *prova* de tal argumento consiste em verificar se a conclusão pode ser derivada das proposições.
+* Método de prova
+O /Analytic Tableaux/ é um método de prova por *contradição* com um modelo de execução bastante compatível com métodos computacionais.
+
+A ideia do método é, dado um argumento lógico:
+
+1. Cria-se uma árvore de prova na qual cada nó representa uma fórmula lógica. A conclusão do argumento é negada e adicionada como última fórmula na árvore;
+2. Enquanto ainda hajam expansões possíveis e não tenha ocorrido nenhuma contradição:
+   1. Expandir as fórmulas com base em um conjunto de regras e adicioná-las na árvore;
+   2. Verificar a existência de alguma contradição entre os nós do galho da árvore;
+3. Caso alguma contradição tenha sido encontrada, então o argumento é válido. Caso contrário o argumento não é válido.
+** Exemplo
+#+attr_org: :width 500
+#+caption: Exemplo de árvore de prova construída
+[[file:assets/tableaux_example.png]]
