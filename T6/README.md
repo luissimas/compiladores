@@ -51,9 +51,9 @@ mix escript.build
 ```
 
 6. Para executar o projeto:
-
+O executável deve receber um arquivo como input
 ``` shell
-./analytic_tableaux "(expressão lógica para ser analisada)"
+./analytic_tableaux in
 ```
 
 ## Explicação do projeto
